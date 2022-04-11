@@ -4,8 +4,12 @@
 
 This GSC Adds a Trials System to bo2 Zombies 
 
-[Supported Maps]
--Tranzit
+## Guide
+
+## Changelog
+
+## Supported Maps
+* -Tranzit
 
 ## Credits
 * [John Kramer]
