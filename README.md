@@ -2,8 +2,6 @@
 
 ## Description
 
-This GSC Adds a Trials System to bo2 Zombies 
-
 ## Guide
 
 ## Changelog
