@@ -12,5 +12,5 @@ This GSC Adds a Trials System to bo2 Zombies
 * -Tranzit
 
 ## Credits
-* [John Kramer]
-* [Jbleezy]
+* John Kramer
+* Jbleezy
