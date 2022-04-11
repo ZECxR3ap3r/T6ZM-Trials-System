@@ -46,19 +46,12 @@ init()
 	precacheshader("gradient");
 	precacheshader("white");
 	precacheshader("menu_mp_star_rating");
+	precacheshader("gradient_fadein");
+	precacheshader("scorebar_zom_1");
 	// Settings
 	setDvar("TrialsHigherThePrice", 1);// Cost of the Trials will be add every 10 rounds + Default TrialsCost
 	setDvar("TrialsCost", 500);// How Much the trials will cost
 	setDvar("TrialsTime", 90);// How Long a Trial Stays Active
-	setDvar("TrialsHUDSQSize", 28);
-    setDvar("TrialsHUDSQWide", getdvarint("TrialsHUDSQSize") * 5);
-    setDvar("TrialsHUDSQDot", getdvarint("TrialsHUDSQSize") * .115);
-    setDvar("TrialsHUDSQStar", getdvarint("TrialsHUDSQDot") * 2.35);
-    setDvar("TrialsHUDX", 5);
-    setDvar("TrialsHUDY", 0 - getdvarint("TrialsHUDSQSize"));
-    setDvar("TrialsHUDRColor", (.8, 0, 0));
-    setDvar("TrialsHUDRCode", "^1");
-    setDvar("TrialsHUDRLevel", "^1None");
 	// Setup
 	if(getdvar( "mapname" ) == "zm_transit"){
 		// Player Podiums
@@ -75,15 +68,31 @@ init()
 	level thread onPlayerConnect();
 }
 
+init_trial_hud() {
+
+    // HUD settings such as sizes, position and fallbacks
+    self.trials_height = 28;
+    self.trials_width = int(self.trials_height * 5);
+    self.trials_space = int(self.trials_height * .115);
+    self.trials_star = int(self.trials_space * 2.35);
+    self.trials_x = 5;
+    self.trials_y = 0 - self.trials_height;
+    self.trials_reward_color = (.8, 0, 0);
+    self.trials_reward_code = "^1";
+    self.trials_reward_level = "^1None";
+    self.trials_init = true;
+}
+
 onPlayerConnect()
 {
-    for(;;)
-    {
+    for(;;){
         level waittill("connected", player); 
         player.ReaperTrialsCurrentMagic = 0;
         wait 20;
         player.score += 100000;
         player giveweapon("galil_zm");
+        flag_wait("initial_blackscreen_passed");
+    	player init_trial_hud();
     }
 }
 
@@ -124,29 +133,27 @@ TrialsSystem(SelectedModel, Origin, Angles, ActivatiorModel, ActivatiorOrigim, A
 	
 	TrialsMainTrigger = spawn("trigger_radius", ActivatiorOrigim, 1, 50, 50);
 	TrialsMainTrigger SetCursorHint( "HINT_NOICON" );
-	while(1)
-	{
+	while(1){
 		TrialsCost = getDvarInt("TrialsCost");
 		if(level.ReaperTrialsActive == 0)
 			TrialsMainTrigger SetHintString("Hold ^3&&1^7 to Activate Trial [Cost: " + TrialsCost + "]");
 		else
 			TrialsMainTrigger SetHintString("Trial is already Running!");
 		TrialsMainTrigger waittill("trigger", player);
-		if(level.ReaperTrialsActive == 0)
-        {
-        	if(player UseButtonPressed())
-        	{
-        		if(player.score < TrialsCost)
-           	 	{
+		if(level.ReaperTrialsActive == 0){
+        	if(player UseButtonPressed()){
+        		if(player.score < TrialsCost){
                	 	player playsound("evt_perk_deny");
                 	wait 1;
             	}
-            	else if(player.score >= TrialsCost)
-            	{
+            	else if(player.score >= TrialsCost){
         			player minus_to_player_score(TrialsCost);
         			player playsound("zmb_cha_ching");
       				Num = randomintrange(0, Challenges.size);
+      				if(isdefined(LastChallenge) && LastChallenge == Challenges[Num])
+      					Num = randomintrange(0, Challenges.size);
         			level thread ChallengeHandler(Challenges[Num]);
+        			LastChallenge = Challenges[Num];
         			level.ReaperTrialsActive++;
 				}
             }
@@ -170,16 +177,20 @@ ChallengeHandler(Challenge)
 		ChallengePoints = 1.5;
 	}
 	else if(Challenge == "KISZ_Trial"){
-		RandomZone = random(level.zones);
-		ZoneName = get_zone_name(RandomZone);
-		ChallengeDescription = "Kill Zombies In\n^3"+ZoneName;
+		keys = getarraykeys( level.zones );
+		Num = randomintrange(0, keys.size);
+		ZoneName = get_zone_name(level.zones[ keys[Num] ]);
+		Zone = level.zones[ keys[Num] ];
+		ChallengeDescription = "Kill Zombies at Location\n^3"+ZoneName;
 		ChallengePoints = 1;
 	}
 	else if(Challenge == "SISZ_Trial"){
-		RandomZone = random(level.zones);
-		ZoneName = get_zone_name(RandomZone);
-		ChallengeDescription = "Stay In Location\n^3"+ZoneName;
-		ChallengePoints = 0.5;
+		keys = getarraykeys( level.zones );
+		Num = randomintrange(0, keys.size);
+		ZoneName = get_zone_name(level.zones[ keys[Num] ]);
+		Zone = level.zones[ keys[Num] ];
+		ChallengeDescription = "Remain Inside Location As Long As Possible\n^3"+ZoneName;
+		ChallengePoints = 1;
 	}
 	else if(Challenge == "GO_Trial"){
 		ChallengeDescription = "Kill Zombies with Grenades";
@@ -189,47 +200,31 @@ ChallengeHandler(Challenge)
 		ChallengeDescription = "Kill Zombies while Crouched";
 		ChallengePoints = 1;
 	}
-	level thread ChallengeHandlerMain(time);
 	// Setup Challenge For Players
 	players = get_players();
 	for(i = 0;i < players.size;i++){
 		if(Challenge != "SISZ_Trial")
-			players[i] thread PlayerTrialHandlerKill(challenge, ChallengePoints, RandomZone);
+			players[i] thread PlayerTrialHandlerKill(challenge, ChallengePoints, Zone);
 		else
-			players[i] thread PlayerTrialHandlerTime(challenge, ChallengePoints, RandomZone);
+			players[i] thread PlayerTrialHandlerTime(challenge, ChallengePoints, Zone);
 			
-		players[i] toggle_trial_challenge_hud();
+		players[i] toggle_trial_challenge_hud(ZoneName);
 		players[i] set_trial_challenge(ChallengeDescription);
 		players[i] set_trial_timer(time);
 	}
-}
-
-ChallengeHandlerMain(time)
-{
 	wait time;
-	players = get_players();
 	for(i = 0;i < players.size;i++){
 		players[i] notify("TrialOver");
-		players[i].trial_hud.bg destroy();
-		players[i].trial_hud.timer_bg destroy();
-		players[i].trial_hud.timer_bar destroy();
-		players[i].trial_hud.timer destroy();
-		players[i].trial_hud.challenge destroy();
-		players[i].trial_hud.common destroy();
-		players[i].trial_hud.rare destroy();
-		players[i].trial_hud.epic destroy();
-		players[i].trial_hud.legend destroy();
+		players[i] toggle_trial_challenge_hud();
 	}
 	level.ReaperTrialsActive = 0;
-	level notify("TrialOver");
 }
 // All Kill Based Challenges COme in here
 PlayerTrialHandlerKill(trial, Points, SpecificZone)
 {
 	level endon("game_ended");
 	self endon("TrialOver");
-	while(1)
-	{
+	while(1){
 		self waittill( "zom_kill", zombie);
 		if(trial == "K_Trial")
 			self AddPlayerMagicPoints(Points);
@@ -245,7 +240,7 @@ PlayerTrialHandlerKill(trial, Points, SpecificZone)
 		}
 		else if(trial == "KISZ_Trial"){
 			if(isdefined(SpecificZone.volume)){
-				if(self istouching(SpecificZone.volume) && zombie istouching(SpecificZone.volume)){
+				if(self istouching(SpecificZone.volumes) && zombie istouching(SpecificZone.volumes)){
 					self AddPlayerMagicPoints(Points);
 				}
 			}
@@ -271,7 +266,7 @@ PlayerTrialHandlerTime(trial, Points, SpecificZone)
 	{
 		if(trial == "SISZ_Trial"){
 			if(isdefined(SpecificZone)){
-				if(isdefined(SpecificZone.volume) && self istouching(SpecificZone.volume)){
+				if(isdefined(SpecificZone.volumes) && self istouching(SpecificZone.volumes)){
 					self AddPlayerMagicPoints(Points);
 				}
 			}
@@ -280,329 +275,370 @@ PlayerTrialHandlerTime(trial, Points, SpecificZone)
 	}
 }
 
-toggle_trial_challenge_hud() {
-    
-    // Sizes and position
-    sq_size = getdvarint("TrialsHUDSQSize");
-    sq_wide = getdvarint("TrialsHUDSQWide");
-    sq_dot = getdvarint("TrialsHUDSQDot");
-    sq_star = getdvarint("TrialsHUDSQStar");
-    x = getdvarint("TrialsHUDX");
-    y = getdvarint("TrialsHUDY");
+toggle_trial_challenge_hud(SpecificZone) {
+    if (!isdefined(self.trials_init))
+        return;
 
-    if(isdefined(self.trial_hud.challenge_hud) && self.trial_hud.challenge_hud) {
-        self.trial_hud.bg destroy();
-        self.trial_hud.timer_bg destroy();
-        self.trial_hud.timer_bar destroy();
-        self.trial_hud.timer destroy();
-        self.trial_hud.challenge destroy();
+    sq_size = self.trials_height;
+    sq_wide = self.trials_width;
+    sq_dot = self.trials_space;
+    sq_star = self.trials_star;
+    x = self.trials_x;
+    y = self.trials_y;
+
+    if (isdefined(self.trials_show_challenge) && self.trials_show_challenge) {
+        self.trials_show_challenge = false;
+        self.trials_bg.alpha = 0;
+        self.trials_timer_bg.alpha = 0;
+        self.trials_timer_bar.alpha = 0;
+        self.trials_timer.alpha = 0;
+        self.trials_challenge destroy();
     } 
-    else{
+
+    else {
+        self.trials_show_challenge = true;
+
         // Main background
-        self.trial_hud.bg = newclienthudelem(self);
-        self.trial_hud.bg.x = x + sq_dot + sq_size;
-        self.trial_hud.bg.y = y;
-        self.trial_hud.bg.horzalign = "user_left";
-        self.trial_hud.bg.alignx = "left";
-        self.trial_hud.bg.vertalign = "user_center";
-        self.trial_hud.bg.aligny = "middle";
-        self.trial_hud.bg.alpha = .6;
-        self.trial_hud.bg.sort = 1;
-        self.trial_hud.bg.foreground = true;
-        self.trial_hud.bg.hidewheninmenu = true;
-        self.trial_hud.bg setshader("gradient", sq_wide, sq_size);
+        if (!isdefined(self.trials_bg)) {
+            self.trials_bg = newclienthudelem(self);
+            self.trials_bg.horzalign = "user_left";
+            self.trials_bg.alignx = "left";
+            self.trials_bg.vertalign = "user_center";
+            self.trials_bg.aligny = "middle";
+            self.trials_bg.x = x + sq_dot + sq_size;
+            self.trials_bg.y = y;
+            self.trials_bg.sort = 1;
+            self.trials_bg.foreground = true;
+            self.trials_bg.hidewheninmenu = true;
+            self.trials_bg setshader("gradient", sq_wide, sq_size);
+        }
+        self.trials_bg.alpha = .6;
 
         // Timer background
-        self.trial_hud.timer_bg = newclienthudelem(self);
-        self.trial_hud.timer_bg.horzalign = "user_left";
-        self.trial_hud.timer_bg.alignx = "left";
-        self.trial_hud.timer_bg.vertalign = "user_center";
-        self.trial_hud.timer_bg.aligny = "middle";
-        self.trial_hud.timer_bg.x = x + sq_dot;
-        self.trial_hud.timer_bg.y = y;
-        self.trial_hud.timer_bg.alpha = .8;
-        self.trial_hud.timer_bg.sort = 2;
-        self.trial_hud.timer_bg.foreground = true;
-        self.trial_hud.timer_bg.hidewheninmenu = true;
-        self.trial_hud.timer_bg setshader("black", sq_size, sq_size);
+        if (!isdefined(self.trials_timer_bg)) {
+            self.trials_timer_bg = newclienthudelem(self);
+            self.trials_timer_bg.horzalign = "user_left";
+            self.trials_timer_bg.alignx = "left";
+            self.trials_timer_bg.vertalign = "user_center";
+            self.trials_timer_bg.aligny = "middle";
+            self.trials_timer_bg.x = x + sq_dot;
+            self.trials_timer_bg.y = y;
+            self.trials_timer_bg.sort = 2;
+            self.trials_timer_bg.foreground = true;
+            self.trials_timer_bg.hidewheninmenu = true;
+            self.trials_timer_bg setshader("black", sq_size, sq_size);
+        }
+        self.trials_timer_bg.alpha = .8;
 
         // Left timer bar
-        self.trial_hud.timer_bar = newclienthudelem(self);
-        self.trial_hud.timer_bar.horzalign = "user_left";
-        self.trial_hud.timer_bar.alignx = "left";
-        self.trial_hud.timer_bar.vertalign = "user_center";
-        self.trial_hud.timer_bar.aligny = "middle";
-        self.trial_hud.timer_bar.x = x;
-        self.trial_hud.timer_bar.y = y;
-        self.trial_hud.timer_bar.color = self.trial_hud.reward_color;
-        self.trial_hud.timer_bar.sort = 3;
-        self.trial_hud.timer_bar.foreground = true;
-        self.trial_hud.timer_bar.hidewheninmenu = true;
-        self.trial_hud.timer_bar setshader("white", sq_dot, sq_size);
+        if (!isdefined(self.trials_timer_bar)) {
+            self.trials_timer_bar = newclienthudelem(self);
+            self.trials_timer_bar.horzalign = "user_left";
+            self.trials_timer_bar.alignx = "left";
+            self.trials_timer_bar.vertalign = "user_center";
+            self.trials_timer_bar.aligny = "middle";
+            self.trials_timer_bar.x = x;
+            self.trials_timer_bar.y = y;
+            self.trials_timer_bar.color = self.trials_reward_color;
+            self.trials_timer_bar.sort = 3;
+            self.trials_timer_bar.foreground = true;
+            self.trials_timer_bar.hidewheninmenu = true;
+            self.trials_timer_bar setshader("white", sq_dot, sq_size);
+        }
+        self.trials_timer_bar.alpha = 1;
 
         // Timer
-        self.trial_hud.timer = newclienthudelem(self);
-        self.trial_hud.timer.horzalign = "user_left";
-        self.trial_hud.timer.alignx = "center";
-        self.trial_hud.timer.vertalign = "user_center";
-        self.trial_hud.timer.aligny = "middle";
-        self.trial_hud.timer.x = x + sq_dot + (sq_size / 2);
-        self.trial_hud.timer.y = y;
-        self.trial_hud.timer.color = self.trial_hud.reward_color;
-        self.trial_hud.timer.font = "small";
-        self.trial_hud.timer.sort = 3;
-        self.trial_hud.timer.foreground = true;
-        self.trial_hud.timer.hidewheninmenu = true;
+        if (!isdefined(self.trials_timer)) {
+            self.trials_timer = newclienthudelem(self);
+            self.trials_timer.horzalign = "user_left";
+            self.trials_timer.alignx = "center";
+            self.trials_timer.vertalign = "user_center";
+            self.trials_timer.aligny = "middle";
+            self.trials_timer.x = x + sq_dot + (sq_size / 2);
+            self.trials_timer.y = y;
+            self.trials_timer.color = self.trials_reward_color;
+            self.trials_timer.font = "small";
+            self.trials_timer.sort = 3;
+            self.trials_timer.foreground = true;
+            self.trials_timer.hidewheninmenu = true;
+        }
+        self.trials_timer.alpha = 1;
 
         // Challenge text
-        self.trial_hud.challenge = newclienthudelem(self);
-        self.trial_hud.challenge.horzalign = "user_left";
-        self.trial_hud.challenge.alignx = "left";
-        self.trial_hud.challenge.vertalign = "user_center";
-        self.trial_hud.challenge.aligny = "middle";
-        self.trial_hud.challenge.x = x + (sq_dot * 3) + sq_size;
-        self.trial_hud.challenge.y = y;
-        self.trial_hud.challenge.sort = 3;
-        self.trial_hud.challenge.foreground = true;
-        self.trial_hud.challenge.hidewheninmenu = true;
+        if (!isdefined(self.trials_challenge)) {
+            self.trials_challenge = newclienthudelem(self);
+            self.trials_challenge.horzalign = "user_left";
+            self.trials_challenge.alignx = "left";
+            self.trials_challenge.vertalign = "user_center";
+            self.trials_challenge.aligny = "middle";
+            self.trials_challenge.x = x + (sq_dot * 3) + sq_size;
+            if(isdefined(SpecificZone))
+        		self.trials_challenge.y = y - 8;
+        	else
+ 	        	self.trials_challenge.y = y;
+            self.trials_challenge.sort = 3;
+            self.trials_challenge.foreground = true;
+            self.trials_challenge.hidewheninmenu = true;
+        }
+        self.trials_challenge.alpha = 1;
+    }
+}
+
+toggle_trial_reward_hud() {
+    if (!isdefined(self.trials_init))
+        return;
+
+    sq_size = self.trials_height;
+    sq_wide = self.trials_width;
+    sq_dot = self.trials_space;
+    sq_star = self.trials_star;
+    x = self.trials_x;
+    y = self.trials_y;
+
+    if (isdefined(self.trials_show_reward) && self.trials_show_reward) {
+        self.trials_show_reward = false;
+        self.trials_reward.alpha = 0;
+        self.trials_common.alpha = 0;
+        self.trials_rare.alpha = 0;
+        self.trials_epic.alpha = 0;
+        self.trials_legend.alpha = 0;
+    }
+
+    else {
+        self.trials_show_reward = true;
+
+        // Reward text
+        if (!isdefined(self.trials_reward)) {
+            self.trials_reward = newclienthudelem(self);
+            self.trials_reward.horzalign = "user_left";
+            self.trials_reward.alignx = "left";
+            self.trials_reward.vertalign = "user_center";
+            self.trials_reward.aligny = "top";
+            self.trials_reward.x = x + (sq_dot * 3) + sq_size;
+            self.trials_reward.y = y + (sq_size / 2) - 1;
+            self.trials_reward.font = "small";
+            self.trials_reward.color = (.75, .75, .75);
+            self.trials_reward.sort = 3;
+            self.trials_reward.foreground = true;
+            self.trials_reward.hidewheninmenu = true;
+            self.trials_reward.label = &"Reward Available: ";
+        }
+        self.trials_reward.alpha = 1;
+
+        // Common tier dot
+        if (!isdefined(self.trials_common)) {
+            self.trials_common = newclienthudelem(self);
+            self.trials_common.horzalign = "user_left";
+            self.trials_common.alignx = "left";
+            self.trials_common.vertalign = "user_center";
+            self.trials_common.aligny = "top";
+            self.trials_common.x = x - 1;
+            self.trials_common.y = y + (sq_size / 2) + sq_dot;
+            self.trials_common.color = (0, 0, 0);
+            self.trials_common.sort = 3;
+            self.trials_common.foreground = true;
+            self.trials_common.hidewheninmenu = true;
+            self.trials_common setshader("menu_mp_star_rating", sq_star, sq_star);
+        }
+        self.trials_common.alpha = .8;
+
+        // Rare tier dot
+        if (!isdefined(self.trials_rare)) {
+            self.trials_rare = newclienthudelem(self);
+            self.trials_rare.horzalign = "user_left";
+            self.trials_rare.alignx = "left";
+            self.trials_rare.vertalign = "user_center";
+            self.trials_rare.aligny = "top";
+            self.trials_rare.x = x + sq_dot + (sq_dot * 2) - 1;
+            self.trials_rare.y = y + (sq_size / 2) + sq_dot;
+            self.trials_rare.color = (0, 0, 0);
+            self.trials_rare.sort = 3;
+            self.trials_rare.foreground = true;
+            self.trials_rare.hidewheninmenu = true;
+            self.trials_rare setshader("menu_mp_star_rating", sq_star, sq_star);
+        }
+        self.trials_rare.alpha = .8;
+
+        // Epic tier dot
+        if (!isdefined(self.trials_epic)) {
+            self.trials_epic = newclienthudelem(self);
+            self.trials_epic.horzalign = "user_left";
+            self.trials_epic.alignx = "left";
+            self.trials_epic.vertalign = "user_center";
+            self.trials_epic.aligny = "top";
+            self.trials_epic.x = x + (sq_dot * 2) + (sq_dot * 4) - 1;
+            self.trials_epic.y = y + (sq_size / 2) + sq_dot;
+            self.trials_epic.color = (0, 0, 0);
+            self.trials_epic.sort = 3;
+            self.trials_epic.foreground = true;
+            self.trials_epic.hidewheninmenu = true;
+            self.trials_epic setshader("menu_mp_star_rating", sq_star, sq_star);
+        }
+        self.trials_epic.alpha = .8;
+
+        // Legendary tier dot
+        if (!isdefined(self.trials_legend)) {
+            self.trials_legend = newclienthudelem(self);
+            self.trials_legend.horzalign = "user_left";
+            self.trials_legend.alignx = "left";
+            self.trials_legend.vertalign = "user_center";
+            self.trials_legend.aligny = "top";
+            self.trials_legend.x = x + (sq_dot * 3) + (sq_dot * 6) - 1;
+            self.trials_legend.y = y + (sq_size / 2) + sq_dot;
+            self.trials_legend.color = (0, 0, 0);
+            self.trials_legend.sort = 3;
+            self.trials_legend.foreground = true;
+            self.trials_legend.hidewheninmenu = true;
+            self.trials_legend setshader("menu_mp_star_rating", sq_star, sq_star);
+        }
+        self.trials_legend.alpha = .8;
     }
 }
 
 draw_reward_alert(text) {
-    if (!isdefined(self.trial_hud))
+    if (!isdefined(self.trials_init))
         return;
 
     if (!isdefined(text))
         text = "REWARD UPGRADED";
-    
-    width = int(getdvarint("TrialsHUDSQSize") * 6.25);
-    height = getdvarint("TrialsHUDSQSize");
+
+    width = int(self.trials_height * 6.25);
+    height = self.trials_height;
 
     // Reward upgrade background
-    self.trial_hud.upgrade_bg = newclienthudelem(self);
-    self.trial_hud.upgrade_bg.horzalign = "user_center";
-    self.trial_hud.upgrade_bg.alignx = "center";
-    self.trial_hud.upgrade_bg.vertalign = "user_center";
-    self.trial_hud.upgrade_bg.aligny = "middle";
-    self.trial_hud.upgrade_bg.x = 0;
-    self.trial_hud.upgrade_bg.y = -160;
-    self.trial_hud.upgrade_bg.alpha = 0;
-    self.trial_hud.upgrade_bg.color = (0, 0, 0);
-    self.trial_hud.upgrade_bg.sort = 0;
-    self.trial_hud.upgrade_bg.foreground = true;
-    self.trial_hud.upgrade_bg.hidewheninmenu = true;
-    self.trial_hud.upgrade_bg setshader("scorebar_zom_1", width, height);
+    if (!isdefined(self.trials_upgrade_shadow)) {
+        self.trials_upgrade_shadow = newclienthudelem(self);
+        self.trials_upgrade_shadow.horzalign = "user_center";
+        self.trials_upgrade_shadow.alignx = "center";
+        self.trials_upgrade_shadow.vertalign = "user_center";
+        self.trials_upgrade_shadow.aligny = "middle";
+        self.trials_upgrade_shadow.x = 0;
+        self.trials_upgrade_shadow.y = -160;
+        self.trials_upgrade_shadow.color = (0, 0, 0);
+        self.trials_upgrade_shadow.sort = 0;
+        self.trials_upgrade_shadow.foreground = true;
+        self.trials_upgrade_shadow.hidewheninmenu = true;
+        self.trials_upgrade_shadow setshader("scorebar_zom_1", width, height);
+    }
 
     // Reward upgrade background 2
-    self.trial_hud.upgrade_texture = newclienthudelem(self);
-    self.trial_hud.upgrade_texture.horzalign = "user_center";
-    self.trial_hud.upgrade_texture.alignx = "center";
-    self.trial_hud.upgrade_texture.vertalign = "user_center";
-    self.trial_hud.upgrade_texture.aligny = "middle";
-    self.trial_hud.upgrade_texture.x = 0;
-    self.trial_hud.upgrade_texture.y = -160;
-    self.trial_hud.upgrade_texture.alpha = 0;
-    self.trial_hud.upgrade_texture.color = (1, 0, 0);
-    self.trial_hud.upgrade_texture.sort = 1;
-    self.trial_hud.upgrade_texture.foreground = true;
-    self.trial_hud.upgrade_texture.hidewheninmenu = true;
-    self.trial_hud.upgrade_texture setshader("scorebar_zom_1", width, height);
+    if (!isdefined(self.trials_upgrade_bg)) {
+        self.trials_upgrade_bg = newclienthudelem(self);
+        self.trials_upgrade_bg.horzalign = "user_center";
+        self.trials_upgrade_bg.alignx = "center";
+        self.trials_upgrade_bg.vertalign = "user_center";
+        self.trials_upgrade_bg.aligny = "middle";
+        self.trials_upgrade_bg.x = 0;
+        self.trials_upgrade_bg.y = -160;
+        self.trials_upgrade_bg.color = (1, 0, 0);
+        self.trials_upgrade_bg.sort = 1;
+        self.trials_upgrade_bg.foreground = true;
+        self.trials_upgrade_bg.hidewheninmenu = true;
+        self.trials_upgrade_bg setshader("scorebar_zom_1", width, height);
+    }
 
     // Reward upgrade text
-    self.trial_hud.upgrade = newclienthudelem(self);
-    self.trial_hud.upgrade.horzalign = "user_center";
-    self.trial_hud.upgrade.alignx = "center";
-    self.trial_hud.upgrade.vertalign = "user_center";
-    self.trial_hud.upgrade.aligny = "middle";
-    self.trial_hud.upgrade.x = 0;
-    self.trial_hud.upgrade.y = -160;
-    self.trial_hud.upgrade.alpha = 0;
-    self.trial_hud.upgrade.fontscale = 1.3;
-    self.trial_hud.upgrade.sort = 2;
-    self.trial_hud.upgrade.foreground = true;
-    self.trial_hud.upgrade.hidewheninmenu = true;
-    self.trial_hud.upgrade settext("REWARD UPGRADED");
-    
+    if (!isdefined(self.trials_upgrade)) {
+        self.trials_upgrade = newclienthudelem(self);
+        self.trials_upgrade.horzalign = "user_center";
+        self.trials_upgrade.alignx = "center";
+        self.trials_upgrade.vertalign = "user_center";
+        self.trials_upgrade.aligny = "middle";
+        self.trials_upgrade.x = 0;
+        self.trials_upgrade.y = -160;
+        self.trials_upgrade.fontscale = 1.3;
+        self.trials_upgrade.sort = 2;
+        self.trials_upgrade.foreground = true;
+        self.trials_upgrade.hidewheninmenu = true;
+        self.trials_upgrade settext("REWARD UPGRADED");
+    }
+
     // Animation
     self playlocalsound("zmb_cha_ching");
-    self.trial_hud.upgrade_bg fadeovertime(.5);
-    self.trial_hud.upgrade_bg.alpha = 1;
-    self.trial_hud.upgrade_texture fadeovertime(.5);
-    self.trial_hud.upgrade_texture.alpha = 1;
-    self.trial_hud.upgrade fadeovertime(.5);
-    self.trial_hud.upgrade.alpha = 1;
+    self.trials_upgrade_shadow.alpha = 0;
+    self.trials_upgrade_bg.alpha = 0;
+    self.trials_upgrade.alpha = 0;
+    self.trials_upgrade_shadow fadeovertime(.5);
+    self.trials_upgrade_shadow.alpha = 1;
+    self.trials_upgrade_bg fadeovertime(.5);
+    self.trials_upgrade_bg.alpha = 1;
+    self.trials_upgrade fadeovertime(.5);
+    self.trials_upgrade.alpha = 1;
     wait 5;
-    self.trial_hud.upgrade_bg fadeovertime(.25);
-    self.trial_hud.upgrade_bg.alpha = 0;
-    self.trial_hud.upgrade_texture fadeovertime(.25);
-    self.trial_hud.upgrade_texture.alpha = 0;
-    self.trial_hud.upgrade fadeovertime(.25);
-    self.trial_hud.upgrade.alpha = 0;
+    self.trials_upgrade_shadow fadeovertime(.25);
+    self.trials_upgrade_shadow.alpha = 0;
+    self.trials_upgrade_bg fadeovertime(.25);
+    self.trials_upgrade_bg.alpha = 0;
+    self.trials_upgrade fadeovertime(.25);
+    self.trials_upgrade.alpha = 0;
     wait .25;
-
-    self.trial_hud.upgrade_bg destroy();
-    self.trial_hud.upgrade_texture destroy();
-    self.trial_hud.upgrade destroy();
-}
-
-toggle_trial_reward_hud() {
-
-    // Sizes and position
-    sq_size = getdvarint("TrialsHUDSQSize");
-    sq_wide = getdvarint("TrialsHUDSQWide");
-    sq_dot = getdvarint("TrialsHUDSQDot");
-    sq_star = getdvarint("TrialsHUDSQStar");
-    x = getdvarint("TrialsHUDX");
-    y = getdvarint("TrialsHUDY");
-
-    if(isdefined(self.trial_hud.reward_hud) && self.trial_hud.reward_hud) {
-        self.trial_hud.reward destroy();
-        self.trial_hud.common destroy();
-        self.trial_hud.rare destroy();
-        self.trial_hud.epic destroy();
-        self.trial_hud.legend destroy();
-    } 
-    else {
-        // Reward text
-        self.trial_hud.reward = newclienthudelem(self);
-        self.trial_hud.reward.horzalign = "user_left";
-        self.trial_hud.reward.alignx = "left";
-        self.trial_hud.reward.vertalign = "user_center";
-        self.trial_hud.reward.aligny = "top";
-        self.trial_hud.reward.x = x + (sq_dot * 3) + sq_size;
-        self.trial_hud.reward.y = y + (sq_size / 2) - 1;
-        self.trial_hud.reward.font = "small";
-        self.trial_hud.reward.color = (.75, .75, .75);
-        self.trial_hud.reward.sort = 3;
-        self.trial_hud.reward.foreground = true;
-        self.trial_hud.reward.hidewheninmenu = true;
-        self.trial_hud.reward.label = &"Reward Available: ";    
-
-        // Common tier dot
-        self.trial_hud.common = newclienthudelem(self);
-        self.trial_hud.common.horzalign = "user_left";
-        self.trial_hud.common.alignx = "left";
-        self.trial_hud.common.vertalign = "user_center";
-        self.trial_hud.common.aligny = "top";
-        self.trial_hud.common.x = x - 1;
-        self.trial_hud.common.y = y + (sq_size / 2) + sq_dot;
-        self.trial_hud.common.color = (0, 0, 0);
-        self.trial_hud.common.alpha = 0;
-        self.trial_hud.common.sort = 3;
-        self.trial_hud.common.foreground = true;
-        self.trial_hud.common.hidewheninmenu = true;
-        self.trial_hud.common setshader("menu_mp_star_rating", sq_star, sq_star);
-
-        // Rare tier dot
-        self.trial_hud.rare = newclienthudelem(self);
-        self.trial_hud.rare.horzalign = "user_left";
-        self.trial_hud.rare.alignx = "left";
-        self.trial_hud.rare.vertalign = "user_center";
-        self.trial_hud.rare.aligny = "top";
-        self.trial_hud.rare.x = x + sq_dot + (sq_dot * 2) - 1;
-        self.trial_hud.rare.y = y + (sq_size / 2) + sq_dot;
-        self.trial_hud.rare.color = (0, 0, 0);
-        self.trial_hud.rare.alpha = 0;
-        self.trial_hud.rare.sort = 3;
-        self.trial_hud.rare.foreground = true;
-        self.trial_hud.rare.hidewheninmenu = true;
-        self.trial_hud.rare setshader("menu_mp_star_rating", sq_star, sq_star);
-
-        // Epic tier dot
-        self.trial_hud.epic = newclienthudelem(self);
-        self.trial_hud.epic.horzalign = "user_left";
-        self.trial_hud.epic.alignx = "left";
-        self.trial_hud.epic.vertalign = "user_center";
-        self.trial_hud.epic.aligny = "top";
-        self.trial_hud.epic.x = x + (sq_dot * 2) + (sq_dot * 4) - 1;
-        self.trial_hud.epic.y = y + (sq_size / 2) + sq_dot;
-        self.trial_hud.epic.color = (0, 0, 0);
-        self.trial_hud.epic.alpha = 0;
-        self.trial_hud.epic.sort = 3;
-        self.trial_hud.epic.foreground = true;
-        self.trial_hud.epic.hidewheninmenu = true;
-        self.trial_hud.epic setshader("menu_mp_star_rating", sq_star, sq_star);
-
-        // Legendary tier dot
-        self.trial_hud.legend = newclienthudelem(self);
-        self.trial_hud.legend.horzalign = "user_left";
-        self.trial_hud.legend.alignx = "left";
-        self.trial_hud.legend.vertalign = "user_center";
-        self.trial_hud.legend.aligny = "top";
-        self.trial_hud.legend.x = x + (sq_dot * 3) + (sq_dot * 6) - 1;
-        self.trial_hud.legend.y = y + (sq_size / 2) + sq_dot;
-        self.trial_hud.legend.color = (0, 0, 0);
-        self.trial_hud.legend.alpha = 0;
-        self.trial_hud.legend.sort = 3;
-        self.trial_hud.legend.foreground = true;
-        self.trial_hud.legend.hidewheninmenu = true;
-        self.trial_hud.legend setshader("menu_mp_star_rating", sq_star, sq_star);
-    }
 }
 
 draw_trial_progress() {
-    if (!isdefined(self.trial_hud))
+    if (!isdefined(self.trials_init))
         return;
 
-    // Sizes and position
-    sq_size = getdvarint("TrialsHUDSQSize");
-    sq_wide = getdvarint("TrialsHUDSQWide");
-    sq_dot = getdvarint("TrialsHUDSQDot");
-    sq_star = getdvarint("TrialsHUDSQStar");
-    x = getdvarint("TrialsHUDX");
-    y = getdvarint("TrialsHUDY");
+    sq_size = self.trials_height;
+    sq_wide = self.trials_width + sq_size;
+    sq_dot = self.trials_space;
+    sq_star = self.trials_star;
+    x = self.trials_x;
+    y = self.trials_y;
 
     // Top gradient line
-    self.trial_hud.progress_t = newclienthudelem(self);
-    self.trial_hud.progress_t.horzalign = "user_left";
-    self.trial_hud.progress_t.alignx = "left";
-    self.trial_hud.progress_t.vertalign = "user_center";
-    self.trial_hud.progress_t.aligny = "top";
-    self.trial_hud.progress_t.x = x + sq_dot;
-    self.trial_hud.progress_t.y = y - int(sq_size / 2);
-    self.trial_hud.progress_t.color = getdvar("TrialsHUDRColor");
-    self.trial_hud.progress_t.sort = 3;
-    self.trial_hud.progress_t.foreground = true;
-    self.trial_hud.progress_t.hidewheninmenu = true;
-    self.trial_hud.progress_t setshader("gradient_fadein", 0, 1);
+    if (!isdefined(self.trials_top_bar)) {
+        self.trials_top_bar = newclienthudelem(self);
+        self.trials_top_bar.horzalign = "user_left";
+        self.trials_top_bar.vertalign = "user_center";
+        self.trials_top_bar.aligny = "top";
+        self.trials_top_bar.y = y - int(sq_size / 2);
+        self.trials_top_bar.color = self.trials_reward_color;
+        self.trials_top_bar.sort = 3;
+        self.trials_top_bar.foreground = true;
+        self.trials_top_bar.hidewheninmenu = true;
+    }
 
     // Bottom gradient line
-    self.trial_hud.progress_b = newclienthudelem(self);
-    self.trial_hud.progress_b.horzalign = "user_left";
-    self.trial_hud.progress_b.alignx = "left";
-    self.trial_hud.progress_b.vertalign = "user_center";
-    self.trial_hud.progress_b.aligny = "bottom";
-    self.trial_hud.progress_b.x = x + sq_dot;
-    self.trial_hud.progress_b.y = y + int(sq_size / 2);
-    self.trial_hud.progress_b.color = getdvar("TrialsHUDRColor");
-    self.trial_hud.progress_b.sort = 3;
-    self.trial_hud.progress_b.foreground = true;
-    self.trial_hud.progress_b.hidewheninmenu = true;
-    self.trial_hud.progress_b setshader("gradient_fadein", 0, 1);
+    if (!isdefined(self.trials_bottom_bar)) {
+        self.trials_bottom_bar = newclienthudelem(self);
+        self.trials_bottom_bar.horzalign = "user_left";
+        self.trials_bottom_bar.vertalign = "user_center";
+        self.trials_bottom_bar.aligny = "bottom";
+        self.trials_bottom_bar.y = y + int(sq_size / 2);
+        self.trials_bottom_bar.color = self.trials_reward_color;
+        self.trials_bottom_bar.sort = 3;
+        self.trials_bottom_bar.foreground = true;
+        self.trials_bottom_bar.hidewheninmenu = true;
+    }
     
     // Animation
     self playlocalsound("cac_cmn_beep");
-    self.trial_hud.progress_t scaleovertime(.25, sq_wide, 1);
-    self.trial_hud.progress_b scaleovertime(.25, sq_wide, 1);
+    self.trials_top_bar setshader("gradient_fadein", 0, 1);
+    self.trials_bottom_bar setshader("gradient_fadein", 0, 1);
+    self.trials_top_bar.alignx = "left";
+    self.trials_top_bar.x = x + sq_dot;
+    self.trials_bottom_bar.alignx = "left";
+    self.trials_bottom_bar.x = x + sq_dot;
+    self.trials_top_bar.alpha = 1;
+    self.trials_bottom_bar.alpha = 1;
+    self.trials_top_bar scaleovertime(.25, sq_wide, 1);
+    self.trials_bottom_bar scaleovertime(.25, sq_wide, 1);
     wait .5;
-    self.trial_hud.progress_t.alignx = "right";
-    self.trial_hud.progress_b.alignx = "right";
-    self.trial_hud.progress_t.x = x + sq_dot + sq_wide;
-    self.trial_hud.progress_b.x = x + sq_dot + sq_wide;
-    self.trial_hud.progress_t scaleovertime(.25, 1, 1);
-    self.trial_hud.progress_b scaleovertime(.25, 1, 1);
-    self.trial_hud.progress_t fadeovertime(.25);
-    self.trial_hud.progress_b fadeovertime(.25);
-    self.trial_hud.progress_t.alpha = 0;
-    self.trial_hud.progress_b.alpha = 0;
-    wait .5;
-
-    self.trial_hud.progress_t destroy();
-    self.trial_hud.progress_b destroy();
+    self.trials_top_bar.alignx = "right";
+    self.trials_bottom_bar.alignx = "right";
+    self.trials_top_bar.x = x + sq_dot + sq_wide;
+    self.trials_bottom_bar.x = x + sq_dot + sq_wide;
+    self.trials_top_bar scaleovertime(.25, 1, 1);
+    self.trials_bottom_bar scaleovertime(.25, 1, 1);
+    self.trials_top_bar fadeovertime(.25);
+    self.trials_bottom_bar fadeovertime(.25);
+    self.trials_top_bar.alpha = 0;
+    self.trials_bottom_bar.alpha = 0;
+    wait .25;
 }
 
 set_trial_reward(tier) {
-    if (!isdefined(self.trial_hud))
+    if (!isdefined(self.trials_init))
         return;
 
     if (!isdefined(tier))
@@ -611,8 +647,8 @@ set_trial_reward(tier) {
     switch(tier) {
         case "none":
             text = "^1None";
-            color = array((0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0));
-            alpha = array(.8, .8, .8, .8);
+            color = array((.8, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0));
+            alpha = array(0, 0, 0, 0);
             break;
 
         case "common":
@@ -643,70 +679,77 @@ set_trial_reward(tier) {
             return;
     }
 
-    self.trial_hud.reward_color = color[0];
-    self.trial_hud.reward_code = getsubstr(text, 0, 2);
-    self.trial_hud.reward_level = text;
-    self.trial_hud.reward settext(text);
-    self.trial_hud.timer.color = color[0];
-    self.trial_hud.timer_bar.color = color[0];
-    self.trial_hud.progress_t.color = color[0];
-    self.trial_hud.progress_b.color = color[0];
-    self.trial_hud.common.color = color[0];
-    self.trial_hud.common.alpha = alpha[0];
-    self.trial_hud.rare.color = color[1];
-    self.trial_hud.rare.alpha = alpha[1];
-    self.trial_hud.epic.color = color[2];
-    self.trial_hud.epic.alpha = alpha[2];
-    self.trial_hud.legend.color = color[3];
-    self.trial_hud.legend.alpha = alpha[3];
+    self.trials_reward_color = color[0];
+    self.trials_reward_code = getsubstr(text, 0, 2);
+    self.trials_reward_level = text;
+    self.trials_reward settext(text);
+    self.trials_reward.alpha = alpha[0];
+    self.trials_timer.color = color[0];
+    self.trials_timer_bar.color = color[0];
+    self.trials_top_bar.color = color[0];
+    self.trials_bottom_bar.color = color[0];
+    self.trials_common.color = color[0];
+    self.trials_common.alpha = alpha[0];
+    self.trials_rare.color = color[1];
+    self.trials_rare.alpha = alpha[1];
+    self.trials_epic.color = color[2];
+    self.trials_epic.alpha = alpha[2];
+    self.trials_legend.color = color[3];
+    self.trials_legend.alpha = alpha[3];
 }
 
 set_trial_challenge(text) {
-    if (!isdefined(self.trial_hud) || !isdefined(text))
+    if (!isdefined(self.trials_init) || !isdefined(text))
         return;
 
-    self.trial_hud.challenge settext(text);    
+    self.trials_challenge settext(text);    
 }
 
 set_trial_timer(time) {
-    if (!isdefined(self.trial_hud) || !isdefined(time))
+    if (!isdefined(self.trials_init) || !isdefined(time))
         return;
 
-    self.trial_hud.timer settimer(time);
+    self.trials_timer settimer(time);
 }
 
-AddPlayerMagicPoints(num)
-{
+AddPlayerMagicPoints(num){
 	Original_Value = self.ReaperTrialsCurrentMagic;
 	self.ReaperTrialsCurrentMagic += num;
-	if(self.ReaperTrialsCurrentMagic >= 100)
-	{
+	self draw_trial_progress();
+	if(self.ReaperTrialsCurrentMagic >= 100){
 		if(Original_Value < self.ReaperTrialsCurrentMagic){
 		
 		}
 		else
 			self.ReaperTrialsCurrentMagic = 100;
 	}
-	if(self.ReaperTrialsCurrentMagic >= 25)
-	{
+	if(self.ReaperTrialsCurrentMagic >= 25){
 		if(self.ReaperTrialsCurrentMagic >= 25){
-			self thread set_trial_reward("common");
-			self thread draw_reward_alert();
+			if(self.trials_reward_color != (0,1,0)){
+				self toggle_trial_reward_hud();
+				self set_trial_reward("common");
+				self thread draw_reward_alert();
+			}
 		}
 		if(self.ReaperTrialsCurrentMagic >= 50){
-			self thread set_trial_reward("rare");
-			self thread draw_reward_alert();
+			if(self.trials_reward_color != (0,.5,1)){
+				self set_trial_reward("rare");
+				self thread draw_reward_alert();
+			}
 		}
 		if(self.ReaperTrialsCurrentMagic >= 75){
-			self thread set_trial_reward("epic");
-			self thread draw_reward_alert();
+			if(self.trials_reward_color != (0.345, 0, 0.576)){
+				self set_trial_reward("epic");
+				self thread draw_reward_alert();
+			}
 		}
 		if(self.ReaperTrialsCurrentMagic == 100){
-			self thread set_trial_reward("legendary");
-			self thread draw_reward_alert();
+			if(self.trials_reward_color != (1, 0.478, 0)){
+				self set_trial_reward("legendary");
+				self thread draw_reward_alert();
+			}
 		}
 	}
-	self thread draw_trial_progress();
 }
 
 PodiumSetupTrigger(num)
@@ -737,10 +780,9 @@ PodiumSetupTrigger(num)
 	Common_Reward_list = [];
 	Common_Reward_list[0] = "nuke";
 	Common_Reward_list[1] = "carpenter";
-	Common_Reward_list[3] = 1000;		
+	Common_Reward_list[2] = 1000;		
 	
-	while(1)
-	{
+	while(1){
 		players = GetPlayers();
 		if(players[num].ReaperTrialsCurrentMagic > 25)
 			reward_level = "^2Common";
@@ -750,13 +792,10 @@ PodiumSetupTrigger(num)
 			reward_level = "^6Epic";
 		if(players[num].ReaperTrialsCurrentMagic == 100)
 			reward_level = "^3Legendary";
-		if(isdefined(trig.has_reward))
-			trig SetHintString( "Press & Hold ^3[{+activate}]^7 To Take Reward" );
+		if(players[num].ReaperTrialsCurrentMagic > 25)
+			trig SetHintString( "Press ^3[{+activate}]^7 To Claim " + reward_level + "^7 Reward");
 		else
-			if(players[num].ReaperTrialsCurrentMagic > 25)
-				trig SetHintString( "Press ^3[{+activate}]^7 To Claim " + reward_level + "^7 Reward");
-			else
-				trig SetHintString( "Reward Level ^3Too Low^7" );
+			trig SetHintString( "Reward Level ^3Too Low^7" );
 		trig waittill( "trigger", player);
 		if(!player UseButtonPressed() || player != GetPlayers()[num] || isdefined(trig.has_reward) ){
 			wait .01;
@@ -766,6 +805,13 @@ PodiumSetupTrigger(num)
 			wait .01;
 			continue;
 		}
+		trig.has_reward = 1;
+		trig waittill( "trigger", player);
+		if(!player UseButtonPressed() || player != GetPlayers()[num] || isdefined(trig.has_reward) ){
+			wait .01;
+			continue;
+		}
+		trig SetHintString( "Press & Hold ^3[{+activate}]^7 To Take Reward" );
 		if(players[num].ReaperTrialsCurrentMagic == 100){
 			legendary_reward_num = randomintrange(0, Legendary_Reward_list.size);
 			final_legendary_reward = Legendary_Reward_list[legendary_reward_num];
@@ -787,6 +833,7 @@ PodiumSetupTrigger(num)
    			players[num] spawn_powerup_a(num,final_common_reward);
 		}
       	players[num].ReaperTrialsCurrentMagic = 0;
+      	players[num] toggle_trial_reward_hud();
 		wait 0.5;
 	}
 }
@@ -794,8 +841,7 @@ PodiumSetupTrigger(num)
 show_only_to_player(num)
 {
 	level endon("game_ended");
-	while(1)
-	{
+	while(1){
 		self SetInvisibleToAll(); 
 		self SetVisibleToPlayer( GetPlayers()[num] );
 		wait 1;
@@ -805,16 +851,16 @@ show_only_to_player(num)
 spawn_powerup_a(num,pow)
 {
 	if(num == 0)
-		self thread maps/mp/zombies/_zm_powerups::specific_powerup_drop(pow, ((878.738, -785.876, 150.125) + (0, 0, 50)));
+		self thread maps/mp/zombies/_zm_powerups::specific_powerup_drop(pow, ((878.738, -785.876, 150.125) + (0, 0, 30)));
 	if(num == 1)
-		self thread maps/mp/zombies/_zm_powerups::specific_powerup_drop(pow, ((962.979, -785.636, 150.125) + (0, 0, 50)));
+		self thread maps/mp/zombies/_zm_powerups::specific_powerup_drop(pow, ((962.979, -785.636, 150.125) + (0, 0, 30)));
 	if(num == 2)
-		self thread maps/mp/zombies/_zm_powerups::specific_powerup_drop(pow, ((1135.96, -1024.87, 150.125) + (0, 0, 50)));
+		self thread maps/mp/zombies/_zm_powerups::specific_powerup_drop(pow, ((1135.96, -1024.87, 150.125) + (0, 0, 30)));
 	if(num == 3)
-		self thread maps/mp/zombies/_zm_powerups::specific_powerup_drop(pow, ((1139.47, -1107.2, 150.125) + (0, 0, 50)));
+		self thread maps/mp/zombies/_zm_powerups::specific_powerup_drop(pow, ((1139.47, -1107.2, 150.125) + (0, 0, 30)));
 }
 
-// Credits to Jbleezy For this Func
+// Credits to Jbleezy
 get_zone_name(zone)
 {
 	if (level.script == "zm_transit")
@@ -1807,5 +1853,3 @@ get_zone_name(zone)
 	}
 	return name;
 }
-
-
