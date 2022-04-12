@@ -954,7 +954,7 @@ AddPlayerMagicPoints(num){
 			if(self.trials_reward_code != "common"){
 				self toggle_trial_reward_hud();
 				self set_trial_reward("common");
-				self thread draw_reward_alert();
+				self thread draw_reward_alert("REWARD AVAILABLE");
 			}
 		}
 		if(self.ReaperTrialsCurrentMagic >= 50){
