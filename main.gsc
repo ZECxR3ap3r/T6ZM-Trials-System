@@ -145,7 +145,8 @@ init_trial_hud() {
     self.trials_x = 5;
     self.trials_y = -120 - self.trials_height;
     self.trials_reward_color = (.8, 0, 0);
-    self.trials_reward_code = "^1";
+    self.trials_reward_code = "none";
+    self.trials_reward_color_code = "^1";
     self.trials_reward_level = "^1None";
     self.trials_init = true;
 }
@@ -903,7 +904,8 @@ set_trial_reward(tier) {
     }
 
     self.trials_reward_color = color[0];
-    self.trials_reward_code = getsubstr(text, 0, 2);
+    self.trials_reward_code = tier;
+    self.trials_reward_color_code = getsubstr(text, 0, 2);
     self.trials_reward_level = text;
     self.trials_reward settext(text);
     self.trials_reward.alpha = alpha[0];
