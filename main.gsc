@@ -42,7 +42,9 @@
 
 init()
 {
+	level.start_weapon = "galil_zm";
 	// Precaching
+	precachemodel("zombie_pickup_perk_bottle");
 	precacheshader("gradient");
 	precacheshader("white");
 	precacheshader("menu_mp_star_rating");
@@ -51,21 +53,86 @@ init()
 	// Settings
 	setDvar("TrialsHigherThePrice", 1);// Cost of the Trials will be add every 10 rounds + Default TrialsCost
 	setDvar("TrialsCost", 500);// How Much the trials will cost
-	setDvar("TrialsTime", 90);// How Long a Trial Stays Active
+	setDvar("TrialsAllowFreePerk", 1);// Adds a Free Perk Powerup to the Trials Rewards
+	setDvar( "scr_screecher_ignore_player", 1 );
+	setDvar( "sv_cheats", 1 );
 	// Setup
 	if(getdvar( "mapname" ) == "zm_transit"){
+		// Collision
+		Collision = spawn( "script_model", (658.607, -286.011, -61.875));
+		Collision.angles = (0, 0, 0);
+		Collision setmodel("collision_wall_512x512x10_standard");
 		// Player Podiums
-    	PodiumModel = "t6_wpn_zmb_jet_gun_world";
-    	PodiumOrigin = array((878.738, -785.876, 150.125), (962.979, -785.876, 150.125), (1139.96, -1024.87, 150.125), (1139.47, -1107.2, 150.125));
-    	PodiumAngles = array((90,80,0), (90,82,0), (90,0,0), (90,0,0));
+    	PodiumModel = "p6_zm_buildable_jetgun_engine";
+    	PodiumOrigin = array((836.974, -279.378, -40.8383), (746.974, -279.378, -40.8383), (486.974, -279.378, -40.8383), (576.974, -279.378, -40.8383));
+    	PodiumAngles = array((90, 0, 0), (90, 0, 0), (90,0,0), (90,0,0));
     	// Trials Main Activate
     	TrialsMainModel = "p6_anim_zm_bus_driver";
-    	TrialsMainOrigin = (887.39, -1043.72, 150.125);
-    	TrialsMainAngles = (90, 60, 0);
+    	TrialsMainOrigin = (669.794, -277.908, -61.7583);
+    	TrialsMainAngles = (0, 0, 0);
     }
 	level.ReaperTrialsActive = 0;
 	level thread TrialsSystem(PodiumModel, PodiumOrigin, PodiumAngles, TrialsMainModel, TrialsMainOrigin, TrialsMainAngles);
 	level thread onPlayerConnect();
+	// Rewards
+	
+	// Powerups
+	AddReward("Legendary", "Zombie_Skull", "Insta Kill", "insta_kill", 1);
+	AddReward("Legendary", "zombie_ammocan", "Max Ammo", "full_ammo", 1);
+	AddReward("Legendary", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
+	if(getdvarint("TrialsAllowFreePerk") == 1)
+		AddReward("Legendary", "zombie_pickup_perk_bottle", "Free Perk", "free_perk", 1);
+		
+	AddReward("Epic", "Zombie_Skull", "Insta Kill", "insta_kill", 1);
+	AddReward("Epic", "zombie_x2_icon", "Double Points", "double_points", 1);
+	AddReward("Epic", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
+	
+	AddReward("Rare", "zombie_carpenter", "Carpenter", "carpenter", 1);
+	AddReward("Rare", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
+	AddReward("Rare", "zombie_x2_icon", "Double Points", "double_points", 1);
+	AddReward("Rare", "zombie_bomb", "Nuke", "nuke", 1);
+	
+	AddReward("Common", "zombie_carpenter", "Carpenter", "carpenter", 1);
+	AddReward("Common", "zombie_z_money_icon", "Bonus Points", "Lose_Points", 1);
+	AddReward("Common", "zombie_bomb", "Nuke", "nuke", 1);
+	// Weapons
+	AddReward("Legendary", "t6_wpn_zmb_raygun_view", "Ray Gun", "ray_gun_zm", 0);
+	AddReward("Legendary", "t6_wpn_lmg_rpd_world", "RPD", "rpd_zm", 0);
+	AddReward("Legendary", "t6_wpn_ar_galil_world", "Galil", "galil_upgraded_zm", 0);
+	AddReward("Legendary", "t6_wpn_lmg_hamr_world", "HAMR", "hamr_upgraded_zm", 0);
+	AddReward("Legendary", "t6_wpn_ar_m16a2_world", "Skullcrusher", "m16_gl_upgraded_zm", 0);
+	
+	AddReward("Epic", "t6_wpn_sniper_dsr50_world", "DSR-50", "dsr50_zm", 0);
+	AddReward("Epic", "t6_wpn_ar_galil_world", "Galil", "galil_zm", 0);
+	AddReward("Epic", "t6_wpn_pistol_b2023r_world", "B23r", "beretta93r_zm", 0);
+	AddReward("Epic", "t6_wpn_ar_m16a2_world", "M16", "m16_zm", 0);
+	AddReward("Epic", "t6_wpn_smg_mp5_world", "MP5", "mp5k_zm", 0);
+	
+	AddReward("Rare", "t6_wpn_smg_mp5_world", "MP5", "mp5k_zm", 0);
+	AddReward("Rare", "t6_wpn_pistol_kard_world", "KAP-40", "kard_zm", 0);
+	AddReward("Rare", "t6_wpn_launch_usrpg_world", "RPG", "usrpg_zm", 0);
+	AddReward("Rare", "t6_wpn_pistol_m1911_world", "M1911", "m1911_zm", 0);
+	AddReward("Rare", "t6_wpn_shotty_870mcs_world", "Remington", "870mcs_zm", 0);
+	
+	AddReward("Common", "t6_wpn_pistol_m1911_world", "M1911", "m1911_zm", 0);
+	AddReward("Common", "t6_wpn_shotty_olympia_world", "Olympia", "rottweil72_zm", 0);
+	AddReward("Common", "t6_wpn_ar_saritch_world", "SMR", "saritch_zm", 0);
+	AddReward("Common", "t6_wpn_ar_m14_world", "M14", "m14_zm", 0);
+	AddReward("Common", "t6_wpn_smg_mp5_world", "MP5", "mp5k_zm", 0);
+}
+
+AddReward(TrialRank, RewardModel, RewardHintname, RewardCodename, Powerup){
+	if(!isdefined(level.Rewards_List))
+		level.Rewards_List = [];
+	
+	Reward = SpawnStruct();
+	Reward.Rank = TrialRank;
+	Reward.Model = RewardModel;
+	Reward.Hint = RewardHintname;
+	Reward.Name = RewardCodename;
+	Reward.Powerup = Powerup;
+		
+	level.Rewards_List[level.Rewards_List.size] = Reward;
 }
 
 init_trial_hud() {
@@ -83,29 +150,182 @@ init_trial_hud() {
     self.trials_init = true;
 }
 
-onPlayerConnect()
+onplayerconnect()
 {
-    for(;;){
-        level waittill("connected", player); 
-        player.ReaperTrialsCurrentMagic = 0;
-        wait 20;
-        player.score += 100000;
-        player giveweapon("galil_zm");
-        flag_wait("initial_blackscreen_passed");
-    	player init_trial_hud();
+	level endon("end_game");
+	for ( ;; )
+	{
+		level waittill( "connected", player );
+		player thread onplayerspawned();
     }
+}
+
+onplayerspawned()
+{
+	level endon("end_game");
+	self endon( "disconnect" );
+	for ( ;; )
+	{
+		self waittill( "spawned_player" );
+		if(!isdefined(self.initial_spawn))
+		{
+			self.initial_spawn = 1;
+			self.ReaperTrialsCurrentMagic = 0;
+			self init_trial_hud();
+		}
+	}
+}
+
+
+PodiumSetupTrigger(num)
+{
+	level endon("end_game");
+	trig = Spawn( "trigger_radius", self.origin + (0, 0, 30), 0, 60, 80 );
+	trig SetCursorHint( "HINT_NOICON" );
+	trig thread show_only_to_player(num);	
+	playfxontag(level._effect[ "character_fire_death_sm" ], trig, "tag_origin");
+	
+	while(1){
+		players = GetPlayers();
+		if(players[num].ReaperTrialsCurrentMagic > 25)
+			reward_level = "^2Common";
+		if(players[num].ReaperTrialsCurrentMagic > 50)
+			reward_level = "^4Rare";
+		if(players[num].ReaperTrialsCurrentMagic > 75)
+			reward_level = "^6Epic";
+		if(players[num].ReaperTrialsCurrentMagic == 100)
+			reward_level = "^3Legendary";
+		if(players[num].ReaperTrialsCurrentMagic > 25)
+			trig SetHintString( "Press ^3&&1^7 To Claim " + reward_level + "^7 Reward");
+		else
+			trig SetHintString( "Reward Level Too Low" );
+		trig waittill( "trigger", player);
+		if(!player UseButtonPressed() || player != GetPlayers()[num] || isdefined(trig.has_reward) ){
+			wait .01;
+			continue;
+		}
+		if(players[num].ReaperTrialsCurrentMagic <= 25){
+			wait .01;
+			continue;
+		}
+		if(players[num].ReaperTrialsCurrentMagic >= 25)
+			Reward = Random_Reward("Common");
+		if(players[num].ReaperTrialsCurrentMagic >= 50)
+			Reward = Random_Reward("Rare");
+		if(players[num].ReaperTrialsCurrentMagic >= 75)
+			Reward = Random_Reward("Epic");
+		if(players[num].ReaperTrialsCurrentMagic == 100)
+			Reward = Random_Reward("Legendary");
+		Timeout = 0;
+		players[num].ReaperTrialsCurrentMagic = 0;
+      	players[num] toggle_trial_reward_hud();
+      	players[num] set_trial_reward("none");
+      	wait 0.1;
+		RewardModel = Spawn( "script_model", self.origin + (0,0,30));
+		RewardModel setmodel(level.Rewards_List[Reward].Model);
+		RewardModel thread RewardModelMain();
+		trig SetHintString( "Press ^3&&1^7 To Take "+level.Rewards_List[Reward].Hint);
+		Trig thread TriggerRewardHandler(players[num], level.Rewards_List[Reward].Name, level.Rewards_List[Reward].Powerup);
+		Trig waittill_any_timeout(30, "Grabbed");
+		Trig notify("Timeout");
+		RewardModel notify("Done");
+		RewardModel delete();
+	}
+}
+
+TriggerRewardHandler(player, Name, Powerup)
+{
+	level endon("end_game");
+	self endon("Timeout");
+	self endon("Grabbed");
+	Timeout = 0;
+	while(Timeout <= 150){
+		if(player usebuttonpressed() && player istouching(self)){
+			if(Powerup == 0){
+				if(Name == "ray_gun_zm" && player hasweapon("raygun_mark2_zm") || Name == "ray_gun_zm" && player hasweapon("raygun_mark2_zm_upgraded")){
+					player playlocalsound( level.zmb_laugh_alias );
+					self notify("Grabbed");
+				}
+				else if(player has_weapon_or_upgrade(Name)){
+					player playlocalsound( level.zmb_laugh_alias );
+					self notify("Grabbed");
+				}
+				player takeweapon(player getcurrentweapon());
+				player giveweapon(Name);
+				player switchtoweapon(Name);
+				self notify("Grabbed");
+			}
+			else{
+				if(Name == "free_perk")
+					free_perk = player maps/mp/zombies/_zm_perks::give_random_perk();
+				else if(Name == "Bonus_Points")
+					player.score += randomintrange( 1, 50 ) * 100;
+				else if(Name == "Lose_Points")
+					player.score -= randomintrange( 1, 50 ) * 100;
+				else
+					specific_powerup_drop(Name, player.origin);
+				self notify("Grabbed");
+			}
+		}
+	}
+}
+
+Random_Reward(TrialLevel)
+{	
+	Choosen = [];
+	for(i = 0; i < level.Rewards_List.size;i++)
+	{
+		if(isdefined(level.Rewards_List[i].Rank == TrialLevel)){
+			Choosen[Choosen.size] = i;
+		}
+	}
+	return Choosen[randomint(Choosen.size)];
+}
+
+RewardModelMain()
+{
+    self endon("Done");
+    level endon("end_game");
+    playfxontag(level._effect[ "powerup_on_solo" ], self, "tag_origin" );
+    self playloopsound( "zmb_spawn_powerup_loop" );
+	while ( isDefined( self ) )
+	{
+		waittime = randomfloatrange( 2.5, 5 );
+		yaw = randomint( 360 );
+		if ( yaw > 300 )
+		{
+			yaw = 300;
+		}
+		else
+		{
+			if ( yaw < 60 )
+			{
+				yaw = 60;
+			}
+		}
+		yaw = self.angles[ 1 ] + yaw;
+		new_angles = ( -60 + randomint( 120 ), yaw, -45 + randomint( 90 ) );
+		self rotateto( new_angles, waittime, waittime * 0.5, waittime * 0.5 );
+		if ( isDefined( self.worldgundw ) )
+		{
+			self.worldgundw rotateto( new_angles, waittime, waittime * 0.5, waittime * 0.5 );
+		}
+		wait randomfloat( waittime - 0.1 );
+	}
 }
 
 TrialsSystem(SelectedModel, Origin, Angles, ActivatiorModel, ActivatiorOrigim, ActivatorAngles)
 {
+	level endon("end_game");
+	
 	Challenges = [];
 	Challenges[0] = "K_Trial";//Regular Kills
 	Challenges[1] = "HK_Trial";//Headshot Kills
 	Challenges[2] = "MK_Trial";//Melee Kills
-	Challenges[4] = "KISZ_Trial";//Kill In Random Zone
-	Challenges[5] = "SISZ_Trial";//Stay In Random Zone
-	Challenges[6] = "GO_Trial";//Kill Zombies With Grenades
-	Challenges[7] = "C_Trial";//Kill Zombies While Crouched
+	Challenges[3] = "KISZ_Trial";//Kill In Random Zone
+	Challenges[4] = "SISZ_Trial";//Stay In Random Zone
+	Challenges[5] = "GO_Trial";//Kill Zombies With Grenades
+	Challenges[6] = "C_Trial";//Kill Zombies While Crouched
 	
 	TrialPodium_Player1 = spawn( "script_model", Origin[0]);
 	TrialPodium_Player1.angles = Angles[0];
@@ -133,6 +353,8 @@ TrialsSystem(SelectedModel, Origin, Angles, ActivatiorModel, ActivatiorOrigim, A
 	
 	TrialsMainTrigger = spawn("trigger_radius", ActivatiorOrigim, 1, 50, 50);
 	TrialsMainTrigger SetCursorHint( "HINT_NOICON" );
+	
+	Zones = GetEntArray("player_volume", "script_noteworthy");
 	while(1){
 		TrialsCost = getDvarInt("TrialsCost");
 		if(level.ReaperTrialsActive == 0)
@@ -152,7 +374,7 @@ TrialsSystem(SelectedModel, Origin, Angles, ActivatiorModel, ActivatiorOrigim, A
       				Num = randomintrange(0, Challenges.size);
       				if(isdefined(LastChallenge) && LastChallenge == Challenges[Num])
       					Num = randomintrange(0, Challenges.size);
-        			level thread ChallengeHandler(Challenges[Num]);
+        			level thread ChallengeHandler(Zones,Challenges[Num]);
         			LastChallenge = Challenges[Num];
         			level.ReaperTrialsActive++;
 				}
@@ -161,52 +383,56 @@ TrialsSystem(SelectedModel, Origin, Angles, ActivatiorModel, ActivatiorOrigim, A
 	}
 }
 
-ChallengeHandler(Challenge)
+ChallengeHandler(Zones,Challenge)
 {
-	time = getdvarint("TrialsTime");
 	if(Challenge == "K_Trial"){
 		ChallengeDescription = "Kill Zombies";
 		ChallengePoints = 0.5;
+		Time = 90;
 	}
 	else if(Challenge == "HK_Trial"){
 		ChallengeDescription = "Kill Zombies With Headshots";
 		ChallengePoints = 1.5;
+		Time = 90;
 	}
 	else if(Challenge == "MK_Trial"){
 		ChallengeDescription = "Kill Zombies with Melee Attacks";
 		ChallengePoints = 1.5;
+		Time = 90;
 	}
 	else if(Challenge == "KISZ_Trial"){
-		keys = getarraykeys( level.zones );
-		Num = randomintrange(0, keys.size);
-		ZoneName = get_zone_name(level.zones[ keys[Num] ]);
-		Zone = level.zones[ keys[Num] ];
+		Num = randomintrange(0, Zones.size);
+		ChoosenZone = Zones[Num];
+		ZoneName = get_zone_name(ChoosenZone.targetname);
 		ChallengeDescription = "Kill Zombies at Location\n^3"+ZoneName;
 		ChallengePoints = 1;
+		Time = 120;
 	}
 	else if(Challenge == "SISZ_Trial"){
-		keys = getarraykeys( level.zones );
-		Num = randomintrange(0, keys.size);
-		ZoneName = get_zone_name(level.zones[ keys[Num] ]);
-		Zone = level.zones[ keys[Num] ];
-		ChallengeDescription = "Remain Inside Location As Long As Possible\n^3"+ZoneName;
+		Num = randomintrange(0, Zones.size);
+		ChoosenZone = Zones[Num];
+		ZoneName = get_zone_name(ChoosenZone.targetname);
+		ChallengeDescription = "Stay in Location\n^3"+ZoneName;
 		ChallengePoints = 1;
+		Time = 120;
 	}
 	else if(Challenge == "GO_Trial"){
 		ChallengeDescription = "Kill Zombies with Grenades";
 		ChallengePoints = 1;
+		Time = 90;
 	}
 	else if(Challenge == "C_Trial"){
 		ChallengeDescription = "Kill Zombies while Crouched";
 		ChallengePoints = 1;
+		Time = 90;
 	}
 	// Setup Challenge For Players
 	players = get_players();
 	for(i = 0;i < players.size;i++){
 		if(Challenge != "SISZ_Trial")
-			players[i] thread PlayerTrialHandlerKill(challenge, ChallengePoints, Zone);
+			players[i] thread PlayerTrialHandlerKill(Challenge, ChallengePoints, ChoosenZone);
 		else
-			players[i] thread PlayerTrialHandlerTime(challenge, ChallengePoints, Zone);
+			players[i] thread PlayerTrialHandlerTime(Challenge, ChallengePoints, ChoosenZone);
 			
 		players[i] toggle_trial_challenge_hud(ZoneName);
 		players[i] set_trial_challenge(ChallengeDescription);
@@ -219,6 +445,7 @@ ChallengeHandler(Challenge)
 	}
 	level.ReaperTrialsActive = 0;
 }
+
 // All Kill Based Challenges COme in here
 PlayerTrialHandlerKill(trial, Points, SpecificZone)
 {
@@ -239,10 +466,8 @@ PlayerTrialHandlerKill(trial, Points, SpecificZone)
 			}
 		}
 		else if(trial == "KISZ_Trial"){
-			if(isdefined(SpecificZone.volume)){
-				if(self istouching(SpecificZone.volumes) && zombie istouching(SpecificZone.volumes)){
-					self AddPlayerMagicPoints(Points);
-				}
+			if(self istouching(SpecificZone) && zombie istouching(SpecificZone)){
+				self AddPlayerMagicPoints(Points);
 			}
 		}
 		else if(trial == "GO_Trial"){
@@ -265,13 +490,11 @@ PlayerTrialHandlerTime(trial, Points, SpecificZone)
 	while(1)
 	{
 		if(trial == "SISZ_Trial"){
-			if(isdefined(SpecificZone)){
-				if(isdefined(SpecificZone.volumes) && self istouching(SpecificZone.volumes)){
-					self AddPlayerMagicPoints(Points);
-				}
+			if(isdefined(SpecificZone) && self istouching(SpecificZone)){
+				self AddPlayerMagicPoints(Points);
 			}
 		}
-		wait 2;
+		wait 2.5;
 	}
 }
 
@@ -725,116 +948,30 @@ AddPlayerMagicPoints(num){
 	}
 	if(self.ReaperTrialsCurrentMagic >= 25){
 		if(self.ReaperTrialsCurrentMagic >= 25){
-			if(self.trials_reward_color != (0,1,0)){
+			if(self.trials_reward_code != "common"){
 				self toggle_trial_reward_hud();
 				self set_trial_reward("common");
 				self thread draw_reward_alert();
 			}
 		}
 		if(self.ReaperTrialsCurrentMagic >= 50){
-			if(self.trials_reward_color != (0,.5,1)){
+			if(self.trials_reward_code != "rare"){
 				self set_trial_reward("rare");
 				self thread draw_reward_alert();
 			}
 		}
 		if(self.ReaperTrialsCurrentMagic >= 75){
-			if(self.trials_reward_color != (0.345, 0, 0.576)){
+			if(self.trials_reward_code != "epic"){
 				self set_trial_reward("epic");
 				self thread draw_reward_alert();
 			}
 		}
 		if(self.ReaperTrialsCurrentMagic == 100){
-			if(self.trials_reward_color != (1, 0.478, 0)){
+			if(self.trials_reward_code != "legendary"){
 				self set_trial_reward("legendary");
 				self thread draw_reward_alert();
 			}
 		}
-	}
-}
-
-PodiumSetupTrigger(num)
-{
-	trig = Spawn( "trigger_radius", self.origin + (0, 0, 30), 0, 60, 80 );
-	trig SetCursorHint( "HINT_NOICON" );
-	trig thread show_only_to_player(num);
-	
-	Legendary_Reward_list = [];
-	Legendary_Reward_list[0] = "full_ammo";
-	Legendary_Reward_list[1] = "insta_kill";
-	Legendary_Reward_list[2] = "free_perk";
-	Legendary_Reward_list[3] = 5000; //Points
-	
-	Epic_Reward_list = [];
-	Epic_Reward_list[0] = "full_ammo";
-	Epic_Reward_list[1] = "double_points";
-	Epic_Reward_list[2] = "free_perk";
-	Epic_Reward_list[3] = 3500; //Points
-	Epic_Reward_list[4] = "insta_kill";
-	
-	Rare_Reward_list = [];
-	Rare_Reward_list[0] = "carpenter";
-	Rare_Reward_list[1] = "double_points";
-	Rare_Reward_list[2] = "nuke";
-	Rare_Reward_list[3] = 2000;
-	
-	Common_Reward_list = [];
-	Common_Reward_list[0] = "nuke";
-	Common_Reward_list[1] = "carpenter";
-	Common_Reward_list[2] = 1000;		
-	
-	while(1){
-		players = GetPlayers();
-		if(players[num].ReaperTrialsCurrentMagic > 25)
-			reward_level = "^2Common";
-		if(players[num].ReaperTrialsCurrentMagic > 50)
-			reward_level = "^4Rare";
-		if(players[num].ReaperTrialsCurrentMagic > 75)
-			reward_level = "^6Epic";
-		if(players[num].ReaperTrialsCurrentMagic == 100)
-			reward_level = "^3Legendary";
-		if(players[num].ReaperTrialsCurrentMagic > 25)
-			trig SetHintString( "Press ^3[{+activate}]^7 To Claim " + reward_level + "^7 Reward");
-		else
-			trig SetHintString( "Reward Level ^3Too Low^7" );
-		trig waittill( "trigger", player);
-		if(!player UseButtonPressed() || player != GetPlayers()[num] || isdefined(trig.has_reward) ){
-			wait .01;
-			continue;
-		}
-		if(players[num].ReaperTrialsCurrentMagic <= 25){
-			wait .01;
-			continue;
-		}
-		trig.has_reward = 1;
-		trig waittill( "trigger", player);
-		if(!player UseButtonPressed() || player != GetPlayers()[num] || isdefined(trig.has_reward) ){
-			wait .01;
-			continue;
-		}
-		trig SetHintString( "Press & Hold ^3[{+activate}]^7 To Take Reward" );
-		if(players[num].ReaperTrialsCurrentMagic == 100){
-			legendary_reward_num = randomintrange(0, Legendary_Reward_list.size);
-			final_legendary_reward = Legendary_Reward_list[legendary_reward_num];
-   			players[num] spawn_powerup_a(num,final_legendary_reward);
-		}
-		if(players[num].ReaperTrialsCurrentMagic > 75){
-			epic_reward_num = randomintrange(0, Epic_Reward_list.size);
-			final_epic_reward = Epic_Reward_list[epic_reward_num];
-   			players[num] spawn_powerup_a(num,final_epic_reward);
-		}
-		if(players[num].reaper_challenge_power > 50){
-			rare_reward_num = randomintrange(0, rare_Reward_list.size);
-			final_rare_reward = rare_Reward_list[rare_reward_num];
-   			players[num] spawn_powerup_a(num,final_rare_reward);
-		}
-		else{
-			common_reward_num = randomintrange(0, common_Reward_list.size);
-			final_common_reward = common_Reward_list[common_reward_num];
-   			players[num] spawn_powerup_a(num,final_common_reward);
-		}
-      	players[num].ReaperTrialsCurrentMagic = 0;
-      	players[num] toggle_trial_reward_hud();
-		wait 0.5;
 	}
 }
 
