@@ -435,7 +435,7 @@ ChallengeHandler(Zones,Challenge)
 		else
 			players[i] thread PlayerTrialHandlerTime(Challenge, ChallengePoints, ChoosenZone);
 			
-		players[i] toggle_trial_challenge_hud(ZoneName);
+		players[i] toggle_trial_challenge_hud();
 		players[i] set_trial_challenge(ChallengeDescription);
 		players[i] set_trial_timer(time);
 	}
@@ -499,7 +499,7 @@ PlayerTrialHandlerTime(trial, Points, SpecificZone)
 	}
 }
 
-toggle_trial_challenge_hud(SpecificZone) {
+toggle_trial_challenge_hud() {
     if (!isdefined(self.trials_init))
         return;
 
@@ -597,10 +597,7 @@ toggle_trial_challenge_hud(SpecificZone) {
             self.trials_challenge.vertalign = "user_center";
             self.trials_challenge.aligny = "middle";
             self.trials_challenge.x = x + (sq_dot * 3) + sq_size;
-            if(isdefined(SpecificZone))
-        		self.trials_challenge.y = y - 8;
-        	else
- 	        	self.trials_challenge.y = y;
+ 	        self.trials_challenge.y = y;
             self.trials_challenge.sort = 3;
             self.trials_challenge.foreground = true;
             self.trials_challenge.hidewheninmenu = true;
@@ -928,7 +925,9 @@ set_trial_challenge(text) {
     if (!isdefined(self.trials_init) || !isdefined(text))
         return;
 
-    self.trials_challenge settext(text);    
+    line_shift = issubstr(text, "\n") ? 6 : 0;
+    self.trials_challenge.y = self.trials_challenge.real_y - line_shift;
+    self.trials_challenge settext(text);
 }
 
 set_trial_timer(time) {
