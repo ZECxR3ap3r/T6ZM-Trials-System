@@ -598,6 +598,7 @@ toggle_trial_challenge_hud() {
             self.trials_challenge.aligny = "middle";
             self.trials_challenge.x = x + (sq_dot * 3) + sq_size;
  	        self.trials_challenge.y = y;
+            self.trials_challenge.real_y = self.trials_challenge.y;
             self.trials_challenge.sort = 3;
             self.trials_challenge.foreground = true;
             self.trials_challenge.hidewheninmenu = true;
