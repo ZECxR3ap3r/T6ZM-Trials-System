@@ -865,9 +865,6 @@ set_trial_reward(tier) {
     if (!isdefined(self.trials_init))
         return;
 
-    if (!isdefined(tier))
-        tier = "common";
-
     switch(tier) {
         case "none":
             text = "^1None";
