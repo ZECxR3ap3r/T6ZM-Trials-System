@@ -516,7 +516,8 @@ toggle_trial_challenge_hud(SpecificZone) {
         self.trials_timer_bg.alpha = 0;
         self.trials_timer_bar.alpha = 0;
         self.trials_timer.alpha = 0;
-        self.trials_challenge destroy();
+        self.trials_challenge destroy(); // This will glitch if a new challenge starts too fast
+		// self.trials_challenge.alpha = 0;
     } 
 
     else {
