@@ -783,6 +783,11 @@ draw_trial_progress() {
     if (!isdefined(self.trials_init))
         return;
 
+    // Drop incoming animation call if the previous one is not completed
+    if (isdefined(self.do_trial_progress) && self.do_trial_progress)
+        return;
+
+    self.do_trial_progress = true;
     sq_size = self.trials_height;
     sq_wide = self.trials_width + sq_size;
     sq_dot = self.trials_space;
@@ -840,6 +845,8 @@ draw_trial_progress() {
     self.trials_top_bar.alpha = 0;
     self.trials_bottom_bar.alpha = 0;
     wait .25;
+
+    self.do_trial_progress = false;
 }
 
 set_trial_reward(tier) {
