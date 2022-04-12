@@ -200,7 +200,7 @@ PodiumSetupTrigger(num)
 		else
 			trig SetHintString( "Reward Level Too Low" );
 		trig waittill( "trigger", player);
-		if(!player UseButtonPressed() || player != GetPlayers()[num] || isdefined(trig.has_reward) ){
+		if(!player UseButtonPressed() || player != GetPlayers()[num]){
 			wait .01;
 			continue;
 		}
@@ -220,7 +220,7 @@ PodiumSetupTrigger(num)
 		players[num].ReaperTrialsCurrentMagic = 0;
       	players[num] toggle_trial_reward_hud();
       	players[num] set_trial_reward("none");
-      	wait 0.1;
+      	wait 0.3;
 		RewardModel = Spawn( "script_model", self.origin + (0,0,30));
 		RewardModel setmodel(level.Rewards_List[Reward].Model);
 		RewardModel thread RewardModelMain();
