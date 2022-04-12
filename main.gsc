@@ -143,7 +143,7 @@ init_trial_hud() {
     self.trials_space = int(self.trials_height * .115);
     self.trials_star = int(self.trials_space * 2.35);
     self.trials_x = 5;
-    self.trials_y = 0 - self.trials_height;
+    self.trials_y = -120 - self.trials_height;
     self.trials_reward_color = (.8, 0, 0);
     self.trials_reward_code = "^1";
     self.trials_reward_level = "^1None";
