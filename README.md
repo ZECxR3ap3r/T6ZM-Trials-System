@@ -5,6 +5,11 @@
 ## Guide
 
 ## Changelog
+* Version 1
+-All Maps Support Added
+-8 Players Support Added
+-Bug Fixes
+-Cleaned up Code
 
 ## Supported Maps
 * -Tranzit
