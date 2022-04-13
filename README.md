@@ -8,6 +8,9 @@
 
 ## Supported Maps
 * -Tranzit
+* -Mob of the Dead
+* -Buried
+* -Origins
 
 ## Credits
 * John Kramer
