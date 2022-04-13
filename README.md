@@ -5,11 +5,11 @@
 ## Guide
 
 ## Supported Maps
-* -Tranzit
-* -Mob of the Dead
-* -Buried
-* -Origins
+- Tranzit
+- Mob of the Dead
+- Buried
+- Origins
 
 ## Credits
-* John Kramer
-* Jbleezy
+- John Kramer
+- Jbleezy
