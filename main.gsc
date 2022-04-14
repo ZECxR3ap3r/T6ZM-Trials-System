@@ -393,7 +393,8 @@ ChallengeHandler(Zones,Challenge)
 		Num = randomintrange(0, Zones.size);
 		ChoosenZone = Zones[Num];
 		ZoneName = get_zone_name(ChoosenZone.targetname);
-		ChallengeDescription = "Kill Zombies at Location\n^3"+ZoneName;
+		ChallengeDescription = "Kill Zombies at Location\n^8"+ZoneName;
+		PositiveChallengeDescription = "Kill Zombies at Location\n^2"+ZoneName;
 		ChallengePoints = 1;
 		Time = 120;
 	}
@@ -401,7 +402,8 @@ ChallengeHandler(Zones,Challenge)
 		Num = randomintrange(0, Zones.size);
 		ChoosenZone = Zones[Num];
 		ZoneName = get_zone_name(ChoosenZone.targetname);
-		ChallengeDescription = "Stay in Location\n^3"+ZoneName;
+		ChallengeDescription = "Stay in Location\n^8"+ZoneName;
+		PositiveChallengeDescription = "Stay in Location\n^2"+ZoneName;
 		ChallengePoints = 1;
 		Time = 120;
 	}
@@ -467,13 +469,38 @@ ChallengeHandler(Zones,Challenge)
 		players[i] toggle_trial_challenge_hud();
 		players[i] set_trial_challenge(ChallengeDescription);
 		players[i] set_trial_timer(time);
+
+		if (isdefined(ChoosenZone))
+			players[i] thread set_trial_location(ChoosenZone, ChallengeDescription, PositiveChallengeDescription);
 	}
 	wait time;
 	for(i = 0;i < players.size;i++){
 		players[i] notify("TrialOver");
+		ChoosenZone = undefined;
+		PositiveChallengeDescription = undefined;
 		players[i] toggle_trial_challenge_hud();
 	}
 	level.ReaperTrialsActive = 0;
+}
+
+// Checks if player is in certain zone and highlights it on HUD
+set_trial_location(zone, out_text, in_text) {
+	self endon("TrialOver");
+	self endon("disconnect");
+	level endon("end_game");
+	before = false;
+
+	while (true) {
+		in_zone = self istouching(zone);
+
+		if (before != in_zone) {
+			text = in_zone ? in_text : out_text;
+			players[i] set_trial_challenge(text);
+			before = in_zone;
+		}
+
+		wait .5;
+	}
 }
 
 // All Kill Based Challenges COme in here
