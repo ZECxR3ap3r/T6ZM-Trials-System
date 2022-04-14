@@ -1073,6 +1073,10 @@ set_trial_challenge(text) {
     if (!isdefined(self.trials_init) || !isdefined(text))
         return;
 
+    // Overwrite trial challenge text if highest trial level (legendary) is reached
+    if (self.trials_reward_code == "legendary")
+        text = self.trials_reward_color_code + "CLAIM REWARD";
+
     line_shift = issubstr(text, "\n") ? 6 : 0;
     self.trials_challenge.y = self.trials_challenge.real_y - line_shift;
     self.trials_challenge settext(text);
