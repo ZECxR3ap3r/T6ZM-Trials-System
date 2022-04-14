@@ -1049,8 +1049,9 @@ set_trial_reward(tier) {
             return;
     }
 
-    self.trials_reward_color = color[0];
+    previous = self.trials_reward_code;
     self.trials_reward_code = tier;
+    self.trials_reward_color = color[0];
     self.trials_reward_color_code = getsubstr(text, 0, 2);
     self.trials_reward_level = text;
     self.trials_reward settext(text);
@@ -1067,11 +1068,17 @@ set_trial_reward(tier) {
     self.trials_epic.alpha = alpha[2];
     self.trials_legend.color = color[3];
     self.trials_legend.alpha = alpha[3];
+
+    // Trigger trial challenge text overwrite or reset
+    if (tier == "legendary" || previous == "legendary")
+        set_trial_challenge(self.trials_challenge_text);
 }
 
 set_trial_challenge(text) {
     if (!isdefined(self.trials_init) || !isdefined(text))
         return;
+
+    self.trials_challenge_text = text;
 
     // Overwrite trial challenge text if highest trial level (legendary) is reached
     if (self.trials_reward_code == "legendary")
