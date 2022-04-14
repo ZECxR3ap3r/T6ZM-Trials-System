@@ -22,13 +22,14 @@
 
 // Trials System by ZECxR3ap3r
 
-init()
-{
+init() {
 	level.start_weapon = "galil_zm";
 	// Precaching
 	precachemodel("t6_wpn_zmb_jet_gun_world");
 	precachemodel("zombie_pickup_perk_bottle");
 	precachemodel("t6_wpn_zmb_raygun_view");
+	precachemodel("p6_anim_zm_buildable_pap");
+	
 	precacheshader("gradient");
 	precacheshader("white");
 	precacheshader("menu_mp_star_rating");
@@ -39,6 +40,8 @@ init()
 	setDvar("TrialsHigherThePrice", 1);// Cost of the Trials will be add every 10 rounds + Default TrialsCost
 	setDvar("TrialsCost", 500);// How Much the trials will cost
 	setDvar("TrialsAllowFreePerk", 1);// Adds a Free Perk Powerup to the Trials Rewards
+	setDvar("TrialsEnableWonderweapons", 1);// Adds Legendary Wonderweapon Rewards
+	setDvar("TrialsEnablePapDrop", 1);// Adds Legendary Pap Powerup Reward
 	
 	setDvar( "scr_screecher_ignore_player", 1 );
 	setDvar( "sv_cheats", 1 );
@@ -105,6 +108,15 @@ init()
 	AddReward("Legendary", "t6_wpn_ar_galil_world", "Galil", "galil_upgraded_zm", 0);
 	AddReward("Legendary", "t6_wpn_lmg_hamr_world", "HAMR", "hamr_upgraded_zm", 0);
 	AddReward("Legendary", "t6_wpn_ar_m16a2_world", "Skullcrusher", "m16_gl_upgraded_zm", 0);
+	if(getdvarint("TrialsEnableWonderweapons") == 1){
+		AddReward("Legendary", "t6_wpn_zmb_raygun2_world", "Ray Gun Mark 2", "raygun_mark2_zm", 0);
+		if(level.script == "zm_prison")
+			AddReward("Legendary", "t6_wpn_zmb_blundergat_world", "Blundergat", "blundergat_zm", 0);
+		if(level.script == "zm_buried")
+			AddReward("Legendary", "t6_wpn_zmb_slowgun_world", "Paralyzer", "slowgun_zm", 0);
+	}
+	if(getdvarint("TrialsEnableWonderweapons") == 1)
+		AddReward("Legendary", "p6_anim_zm_buildable_pap", "Weapon Upgrade", "WeaponUpgrade", 1);
 		
 	AddReward("Epic", "Zombie_Skull", "Insta Kill", "insta_kill", 1);
 	AddReward("Epic", "zombie_x2_icon", "Double Points", "double_points", 1);
@@ -135,7 +147,7 @@ init()
 	AddReward("Common", "t6_wpn_smg_mp5_world", "MP5", "mp5k_zm", 0);
 }
 
-AddReward(TrialRank, RewardModel, RewardHintname, RewardCodename, Powerup){
+AddReward(TrialRank, RewardModel, RewardHintname, RewardCodename, Powerup) {
 	if(!isdefined(level.Rewards_List))
 		level.Rewards_List = [];
 	
@@ -166,8 +178,7 @@ init_trial_hud() {
     self.trials_init = true;
 }
 
-onplayerconnect()
-{
+onplayerconnect() {
 	level endon("end_game");
 	for ( ;; )
 	{
@@ -176,8 +187,7 @@ onplayerconnect()
     }
 }
 
-onplayerspawned()
-{
+onplayerspawned() {
 	level endon("end_game");
 	self endon( "disconnect" );
 	for ( ;; )
@@ -188,31 +198,24 @@ onplayerspawned()
 			self.initial_spawn = 1;
 			self.ReaperTrialsCurrentMagic = 0;
 			self init_trial_hud();
-			wait 10;
-			if(self.sessionstate == "spectator")
-			{
-				self [[level.spawnplayer]]();
-			}
 			wait 5;
-			self iprintln("^5Trials System Version 1.0 ^7By ^2ZECxR3ap3r ^7& ^1John Kramer");
-			self EnableInvulnerability();
+			self iprintln("^5Trials System Version 1.0 ^7By ^1ZECxR3ap3r ^7& ^1John Kramer");
 		}
 	}
 }
 
-TriggerRewardHandler(player, Name, Powerup)
-{
+TriggerRewardHandler(player, Name, Powerup) {
 	level endon("end_game");
 	self endon("Timeout");
 	self endon("Grabbed");
 	while(1){
 		if(player usebuttonpressed() && player istouching(self)){
 			if(Powerup == 0){
-				if(Name == "ray_gun_zm" && player hasweapon("raygun_mark2_zm") || Name == "ray_gun_zm" && player hasweapon("raygun_mark2_zm_upgraded")){
+				if(Name == "ray_gun_zm" && player has_weapon_or_upgrade("raygun_mark2_zm") || Name == "Mark2" && player has_weapon_or_upgrade("ray_gun_zm")){
 					player playlocalsound( level.zmb_laugh_alias );
 					self notify("Grabbed");
 				}
-				else if(player has_weapon_or_upgrade(Name)){
+				if(player has_weapon_or_upgrade(Name)){
 					player playlocalsound( level.zmb_laugh_alias );
 					self notify("Grabbed");
 				}
@@ -232,6 +235,18 @@ TriggerRewardHandler(player, Name, Powerup)
 					player.score += randomintrange( 1, 50 ) * 100;
 				else if(Name == "Lose_Points")
 					player.score -= randomintrange( 1, 50 ) * 100;
+				else if(Name == "WeaponUpgrade"){
+					weapon = self get_upgrade_weapon( self getcurrentweapon(), 0 );
+					if(IsDefined( weapon ) && !self has_upgrade(self getcurrentweapon())){
+						self takeweapon( self getcurrentweapon());
+						self giveweapon( weapon, 0, self get_pack_a_punch_weapon_options( weapon ) );
+						self givestartammo( weapon );
+						self givemaxammo( weapon );
+						self switchtoweapon( weapon );
+					}
+					else
+						player playlocalsound( level.zmb_laugh_alias );
+				}
 				else
 					specific_powerup_drop(Name, player.origin);
 				self notify("Grabbed");
@@ -241,19 +256,17 @@ TriggerRewardHandler(player, Name, Powerup)
 	}
 }
 
-Random_Reward(TrialLevel)
-{	
+Random_Reward(TrialLevel) {	
 	Choosen = [];
 	for(i = 0; i < level.Rewards_List.size;i++){
-		if(isdefined(level.Rewards_List[i].Rank) && level.Rewards_List[i].Rank == TrialLevel)){
+		if(isdefined(level.Rewards_List[i].Rank) && level.Rewards_List[i].Rank == TrialLevel){
 			Choosen[Choosen.size] = i;
 		}
 	}
 	return Choosen[randomint(Choosen.size)];
 }
 
-RewardModelMain()
-{
+RewardModelMain() {
     self endon("Done");
     level endon("end_game");
     playfxontag(level._effect["powerup_on_solo"], self, "tag_origin");
@@ -276,8 +289,7 @@ RewardModelMain()
 	}
 }
 
-TrialsSystem(SelectedModel, Origin, Angles, ActivatiorModel, ActivatiorOrigim, ActivatorAngles)
-{
+TrialsSystem(SelectedModel, Origin, Angles, ActivatiorModel, ActivatiorOrigim, ActivatorAngles) {
 	level endon("end_game");
 	
 	Challenges = [];
@@ -291,7 +303,7 @@ TrialsSystem(SelectedModel, Origin, Angles, ActivatiorModel, ActivatiorOrigim, A
 	Challenges[7] = "NAIM_Trial";//No Aim
 	Challenges[8] = "CR_Trial";//Close Range Kills
 	Challenges[9] = "BR_Trial";//Big Range Kills
-	Challenges[10] = "TD_Trial";//Take Damage
+	Challenges[10] = "TD_Trial";//Take Damage*/
 	if(getDvar( "ui_zm_mapstartlocation" ) != "farm" || getDvar( "ui_zm_mapstartlocation" ) != "station"){
 		Challenges[11] = "KISZ_Trial";//Kill In Random Zone
 		Challenges[12] = "SISZ_Trial";//Stay In Random Zone
@@ -332,6 +344,15 @@ TrialsSystem(SelectedModel, Origin, Angles, ActivatiorModel, ActivatiorOrigim, A
 	
 	Zones = GetEntArray("player_volume", "script_noteworthy");
 	
+	if ( getDvar( "ui_zm_mapstartlocation" ) == "town" ){
+		for(i = 0;i < Zones.size;i++){
+			if(Zones[i].targetname == "zone_tow" || Zones[i].targetname == "zone_bar" || Zones[i].targetname == "zone_ban" || Zones[i].targetname == "zone_town_north" || Zones[i].targetname == "zone_town_west" || Zones[i].targetname == "zone_town_east" || Zones[i].targetname == "zone_town_barber" || Zones[i].targetname == "zone_town_south" ){
+				if(!isdefined(ZonesForSurvival))
+					ZonesForSurvival = [];
+				ZonesForSurvival[ZonesForSurvival.size] = Zones[i];
+			}
+		}
+	}
 	TrialsCost = getDvarInt("TrialsCost");
 	Challenges = array_randomize(Challenges);
 	Num = 0;
@@ -352,7 +373,10 @@ TrialsSystem(SelectedModel, Origin, Angles, ActivatiorModel, ActivatiorOrigim, A
         			player playsound("zmb_cha_ching");
         			if(Num >= Challenges.size)
     					Challenges = cycle_randomize(Challenges);
-        			level thread ChallengeHandler(Zones,Challenges[Num]);
+    				if(isdefined(ZonesForSurvival))
+        				level thread ChallengeHandler(ZonesForSurvival,Challenges[Num]);
+        			else
+        				level thread ChallengeHandler(Zones,Challenges[Num]);
         			Num++;
         			level.ReaperTrialsActive++;
 				}
@@ -372,8 +396,7 @@ cycle_randomize(indices) {
     return new_indices;
 }
 
-ChallengeHandler(Zones,Challenge)
-{
+ChallengeHandler(Zones,Challenge){
 	if(Challenge == "K_Trial"){
 		ChallengeDescription = "Kill Zombies";
 		ChallengePoints = 1;
@@ -402,8 +425,8 @@ ChallengeHandler(Zones,Challenge)
 		Num = randomintrange(0, Zones.size);
 		ChoosenZone = Zones[Num];
 		ZoneName = get_zone_name(ChoosenZone.targetname);
-		ChallengeDescription = "Stay in Location\n^8"+ZoneName;
-		PositiveChallengeDescription = "Stay in Location\n^2"+ZoneName;
+		ChallengeDescription = "Stay at Location\n^8"+ZoneName;
+		PositiveChallengeDescription = "Stay at Location\n^2"+ZoneName;
 		ChallengePoints = 1;
 		Time = 120;
 	}
@@ -469,21 +492,18 @@ ChallengeHandler(Zones,Challenge)
 		players[i] toggle_trial_challenge_hud();
 		players[i] set_trial_challenge(ChallengeDescription);
 		players[i] set_trial_timer(time);
-
-		if (isdefined(ChoosenZone))
+		
+		if(isdefined(ChoosenZone))
 			players[i] thread set_trial_location(ChoosenZone, ChallengeDescription, PositiveChallengeDescription);
 	}
 	wait time;
 	for(i = 0;i < players.size;i++){
 		players[i] notify("TrialOver");
-		ChoosenZone = undefined;
-		PositiveChallengeDescription = undefined;
 		players[i] toggle_trial_challenge_hud();
 	}
 	level.ReaperTrialsActive = 0;
 }
 
-// Checks if player is in certain zone and highlights it on HUD
 set_trial_location(zone, out_text, in_text) {
 	self endon("TrialOver");
 	self endon("disconnect");
@@ -493,19 +513,17 @@ set_trial_location(zone, out_text, in_text) {
 	while (true) {
 		in_zone = self istouching(zone);
 
-		if (before != in_zone) {
+		if(before != in_zone) {
 			text = in_zone ? in_text : out_text;
 			self set_trial_challenge(text);
-            before = in_zone;
+			before = in_zone;
 		}
-
-		wait .5;
+		wait 1;
 	}
 }
 
 // All Kill Based Challenges COme in here
-PlayerTrialHandlerKill(trial, Points, SpecificZone)
-{
+PlayerTrialHandlerKill(trial, Points, SpecificZone){
 	level endon("game_ended");
 	self endon("TrialOver");
 	while(1){
@@ -565,8 +583,7 @@ PlayerTrialHandlerKill(trial, Points, SpecificZone)
 	}
 }
 // All Time Based Challenges Come in here
-PlayerTrialHandlerTime(trial, Points, SpecificZone)
-{
+PlayerTrialHandlerTime(trial, Points, SpecificZone){
 	level endon("game_ended");
 	self endon("TrialOver");
 	while(1){
@@ -589,9 +606,9 @@ PlayerTrialHandlerTime(trial, Points, SpecificZone)
 			}
 		}
 		else if(trial == "BRS_Trial"){
-			level waittill("spent_points", player, points);
+			level waittill("spent_points", player, PointsSpent);
 			if(Player == self){
-				if(points >= 100){
+				if(PointsSpent >= 100){
 					self thread AddPlayerMagicPoints(Points);
 				}
 			}
@@ -600,12 +617,12 @@ PlayerTrialHandlerTime(trial, Points, SpecificZone)
 	}
 }
 
-PodiumSetupTrigger(ModelOrigin,Index)
-{
+PodiumSetupTrigger(ModelOrigin,Index){
 	level endon("end_game");
 	trigger = Spawn( "trigger_radius", self.origin + (0, 0, 30), 0, 30, 30 );
 	trigger SetCursorHint( "HINT_NOICON" );
-	trigger thread ShowToSpecific(Index);
+	CalculatedOrigin = ModelOrigin + (0,10,18);
+	trigger thread ShowToSpecific(CalculatedOrigin,Index);
 	while(1){
 		players = GetPlayers();
 		if(players[Index].ReaperTrialsCurrentMagic >= 25)
@@ -626,7 +643,7 @@ PodiumSetupTrigger(ModelOrigin,Index)
 				wait .1;
 				continue;
 			}
-			if(players[Index].ReaperTrialsCurrentMagic <= 25){
+			if(players[Index].ReaperTrialsCurrentMagic < 25){
 				wait .1;
 				continue;
 			}
@@ -645,7 +662,7 @@ PodiumSetupTrigger(ModelOrigin,Index)
       			wait 0.5;
       		else
       			RewardModel waittill("Done");
-			RewardModel = Spawn( "script_model", ModelOrigin + (0,0,40));
+			RewardModel = Spawn( "script_model", CalculatedOrigin + (0,0,28));
 			RewardModel setmodel(level.Rewards_List[Reward].Model);
 			RewardModel thread RewardModelMain();
 			trigger SetHintString( "Press ^3&&1^7 To Take "+level.Rewards_List[Reward].Hint);
@@ -782,6 +799,11 @@ toggle_trial_reward_hud() {
     y = self.trials_y;
 
     if (isdefined(self.trials_show_reward) && self.trials_show_reward) {
+    
+    	// Wait for last trial progress animation before hide
+        while (self.do_trial_progress)
+            wait .1;
+     	
         self.trials_show_reward = false;
         self.trials_reward.alpha = 0;
         self.trials_common.alpha = 0;
@@ -1038,7 +1060,7 @@ set_trial_reward(tier) {
     if (!isdefined(self.trials_init))
         return;
 
-    if (self.trials_reward_code == tier)
+    if (isdefined(self.trials_reward_code) && self.trials_reward_code == tier)
         return;
 
     switch(tier) {
@@ -1076,9 +1098,8 @@ set_trial_reward(tier) {
             return;
     }
 
-    previous = self.trials_reward_code;
-    self.trials_reward_code = tier;
     self.trials_reward_color = color[0];
+    self.trials_reward_code = tier;
     self.trials_reward_color_code = getsubstr(text, 0, 2);
     self.trials_reward_level = text;
     self.trials_reward settext(text);
@@ -1095,7 +1116,7 @@ set_trial_reward(tier) {
     self.trials_epic.alpha = alpha[2];
     self.trials_legend.color = color[3];
     self.trials_legend.alpha = alpha[3];
-
+    
     // Trigger trial challenge text overwrite or reset
     if (tier == "legendary" || previous == "legendary")
         set_trial_challenge(self.trials_challenge_text);
@@ -1157,18 +1178,20 @@ AddPlayerMagicPoints(num){
 	}
 }
 
-show_only_to_player(num)
-{
+ShowToSpecific(FXOrigin,Index){
 	level endon("game_ended");
 	while(1){
 		self SetInvisibleToAll(); 
-		self SetVisibleToPlayer( GetPlayers()[num] );
-		wait 10;
+		self SetVisibleToPlayer( GetPlayers()[Index] );
+		if(isdefined(GetPlayers()[Index])){
+			if(isdefined(GetPlayers()[Index].ReaperTrialsCurrentMagic) && GetPlayers()[Index].ReaperTrialsCurrentMagic >= 25)
+				playfx( level._effect[ "character_fire_death_sm" ], FXOrigin);
+		}
+		wait 5;
 	}
 }
 
 get_zone_name(key) {
-
     // Caching and array lookup is way more efficient
     if (isdefined(level.zone_names))
         return level.zone_names[key];
@@ -1436,6 +1459,5 @@ get_zone_name(key) {
             level.zone_names["zone_robot_head"] = "Robot's Head";
             break;
     }
-
     return level.zone_names[key];
 }
