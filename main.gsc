@@ -29,7 +29,7 @@ init() {
 	precachemodel("zombie_pickup_perk_bottle");
 	precachemodel("t6_wpn_zmb_raygun_view");
 	precachemodel("p6_anim_zm_buildable_pap");
-	
+	precachemodel("collision_wall_256x256x10_standard");
 	precacheshader("gradient");
 	precacheshader("white");
 	precacheshader("menu_mp_star_rating");
@@ -54,9 +54,10 @@ init() {
     		PodiumModel = "t6_wpn_zmb_jet_gun_world";
     		PodiumOrigin = array((495.129, -289.81, -39.875), (595.129, -289.81, -39.875), (775.129, -289.81, -39.875), (875.129, -289.81, -39.875));
     		PodiumAngles = array((90, 270, 0), (90, 270, 0), (90,270,0), (90,270,0));
-    		TrialsMainModel = "p6_anim_zm_bus_driver";
+    		TrialsMainModel = "zombie_teddybear";
     		TrialsMainOrigin = (685.358, -277.641, -63.0248);
     		TrialsMainAngles = (0, 0, 0);
+    		FXOriginOffset = (0,10,18);
     	}
    	 	else if ( getDvar( "ui_zm_mapstartlocation" ) == "farm" ){
 			Collision = spawn( "script_model", (7070.82, -5715.47, -46.2625));
@@ -65,9 +66,9 @@ init() {
     		PodiumModel = "t6_wpn_zmb_jet_gun_world";
     		PodiumOrigin = array((7070.94, -5798.61, -28.2646), (7070.94, -5744.61, -28.2646), (7070.94, -5692.61, -28.2646), (7070.94, -5638.61, -28.2646));
     		PodiumAngles = array((90, 0, 0), (90, 0, 0), (90,0,0), (90,0,0));
-    		TrialsMainModel = "p6_anim_zm_bus_driver";
+    		TrialsMainModel = "zombie_teddybear";
     		TrialsMainOrigin = (7683.7, -5559.19, 7.12722);
-    		TrialsMainAngles = (-16, 30, 4);
+    		TrialsMainAngles = (0, 30, 0);
     	}
     	else if ( getDvar( "ui_zm_mapstartlocation" ) == "station" ){
 			Collision = spawn( "script_model", (-6298.53, 5449.84, 84.125));
@@ -76,9 +77,9 @@ init() {
     		PodiumModel = "t6_wpn_zmb_jet_gun_world";
     		PodiumOrigin = array((-6314.29, 5525.95, -35.875), (-6314.29, 5465.95, -35.875), (-6314.29, 5405.95, -35.875), (-6314.29, 5345.95, -35.875));
     		PodiumAngles = array((90, 0, 0), (90, 0, 0), (90,0,0), (90,0,0));
-    		TrialsMainModel = "p6_anim_zm_bus_driver";
+    		TrialsMainModel = "zombie_teddybear";
     		TrialsMainOrigin = (-6076.73, 5601.59, -31.875);
-    		TrialsMainAngles = (0, -40, -7);
+    		TrialsMainAngles = (0, -40, 0);
     	}
     }
     else if(level.script == "zm_prison"){
@@ -91,9 +92,21 @@ init() {
     	TrialsMainModel = "p6_zm_al_wall_trap_control_red";
     	TrialsMainOrigin = (2470.36, 9752.72, 1764.13);
     	TrialsMainAngles = (0, -180, 0);
+    	FXOriginOffset = (17,0,15);
+    }
+    else if(level.script == "zm_buried"){
+    	Collision = spawn( "script_model", (1355.53, 1397.91, 336.474));
+		Collision.angles = (0, -20, 0);
+		Collision setmodel("collision_wall_256x256x10_standard");
+    	PodiumModel = "p6_zm_bu_ether_amplifier";
+    	PodiumOrigin = array((1416.2, 1364.68, 200.125), (1365.2, 1383.68, 200.125), (1307.2, 1403.68, 200.125), (1247.2, 1425.68, 200.125));
+    	PodiumAngles = array((0, 0, 0), (0, 0, 0), (0,0,0), (0,0,0));
+    	TrialsMainModel = "zombie_teddybear";
+    	TrialsMainOrigin = (1634.18, 2214.07, 100.125);
+    	TrialsMainAngles = (0, -110, 0);
     }
 	level.ReaperTrialsActive = 0;
-	level thread TrialsSystem(PodiumModel, PodiumOrigin, PodiumAngles, TrialsMainModel, TrialsMainOrigin, TrialsMainAngles);
+	level thread TrialsSystem(FXOriginOffset,PodiumModel, PodiumOrigin, PodiumAngles, TrialsMainModel, TrialsMainOrigin, TrialsMainAngles);
 	level thread onPlayerConnect();
 	
 	// Rewards
@@ -196,10 +209,11 @@ onplayerspawned() {
 		if(!isdefined(self.initial_spawn))
 		{
 			self.initial_spawn = 1;
-			self.ReaperTrialsCurrentMagic = 0;
+			self.ReaperTrialsCurrentMagic = 24;
 			self init_trial_hud();
-			wait 5;
+			wait 15;
 			self iprintln("^5Trials System Version 1.0 ^7By ^1ZECxR3ap3r ^7& ^1John Kramer");
+			self.score += 100000;
 		}
 	}
 }
@@ -237,7 +251,7 @@ TriggerRewardHandler(player, Name, Powerup) {
 					player.score -= randomintrange( 1, 50 ) * 100;
 				else if(Name == "WeaponUpgrade"){
 					weapon = self get_upgrade_weapon( self getcurrentweapon(), 0 );
-					if(IsDefined( weapon ) && !self has_upgrade(self getcurrentweapon())){
+					if(IsDefined( weapon )){
 						self takeweapon( self getcurrentweapon());
 						self giveweapon( weapon, 0, self get_pack_a_punch_weapon_options( weapon ) );
 						self givestartammo( weapon );
@@ -289,7 +303,7 @@ RewardModelMain() {
 	}
 }
 
-TrialsSystem(SelectedModel, Origin, Angles, ActivatiorModel, ActivatiorOrigim, ActivatorAngles) {
+TrialsSystem(CalculatedOrigin,SelectedModel, Origin, Angles, ActivatiorModel, ActivatiorOrigim, ActivatorAngles) {
 	level endon("end_game");
 	
 	Challenges = [];
@@ -314,30 +328,32 @@ TrialsSystem(SelectedModel, Origin, Angles, ActivatiorModel, ActivatiorOrigim, A
 	TrialPodium_Player1 = spawn( "script_model", Origin[0]);
 	TrialPodium_Player1.angles = Angles[0];
 	TrialPodium_Player1 setmodel(SelectedModel);
-	TrialPodium_Player1 thread PodiumSetupTrigger(Origin[0],0);
-	TrialPodium_Player1 thread PodiumSetupTrigger(Origin[0],4);
+	TrialPodium_Player1 thread PodiumSetupTrigger(Origin[0] + CalculatedOrigin,0);
+	TrialPodium_Player1 thread PodiumSetupTrigger(Origin[0] + CalculatedOrigin,4);
 	
 	TrialPodium_Player2 = spawn( "script_model", Origin[1]);
 	TrialPodium_Player2.angles = Angles[1];
 	TrialPodium_Player2 setmodel(SelectedModel);
-	TrialPodium_Player2 thread PodiumSetupTrigger(Origin[1],1);
-	TrialPodium_Player2 thread PodiumSetupTrigger(Origin[1],5);
+	TrialPodium_Player2 thread PodiumSetupTrigger(Origin[1] + CalculatedOrigin,1);
+	TrialPodium_Player2 thread PodiumSetupTrigger(Origin[1] + CalculatedOrigin,5);
 	
 	TrialPodium_Player3 = spawn( "script_model", Origin[2]);
 	TrialPodium_Player3.angles = Angles[2];
 	TrialPodium_Player3 setmodel(SelectedModel);
-	TrialPodium_Player3 thread PodiumSetupTrigger(Origin[2],2);
-	TrialPodium_Player3 thread PodiumSetupTrigger(Origin[2],6);
+	TrialPodium_Player3 thread PodiumSetupTrigger(Origin[2] + CalculatedOrigin,2);
+	TrialPodium_Player3 thread PodiumSetupTrigger(Origin[2] + CalculatedOrigin,6);
 	
 	TrialPodium_Player4 = spawn( "script_model", Origin[3]);
 	TrialPodium_Player4.angles = Angles[3];
 	TrialPodium_Player4 setmodel(SelectedModel);
-	TrialPodium_Player4 thread PodiumSetupTrigger(Origin[3],3);
-	TrialPodium_Player4 thread PodiumSetupTrigger(Origin[3],7);
+	TrialPodium_Player4 thread PodiumSetupTrigger(Origin[3] + CalculatedOrigin,3);
+	TrialPodium_Player4 thread PodiumSetupTrigger(Origin[3] + CalculatedOrigin,7);
 	
 	TrialMainModel = spawn( "script_model", ActivatiorOrigim);
 	TrialMainModel.angles = ActivatorAngles;
 	TrialMainModel setmodel(ActivatiorModel);
+	if(level.script != "zm_prison")
+		TrialMainModel thread MainModelAnimation();
 	
 	TrialsMainTrigger = spawn("trigger_radius", ActivatiorOrigim, 1, 50, 50);
 	TrialsMainTrigger SetCursorHint( "HINT_NOICON" );
@@ -382,6 +398,16 @@ TrialsSystem(SelectedModel, Origin, Angles, ActivatiorModel, ActivatiorOrigim, A
 				}
             }
 		}
+	}
+}
+
+MainModelAnimation(){
+	level endon("end_game");
+	while(1){
+		self moveto(self.origin + (0,0,20),randomfloatrange(0.5,4));
+		self waittill("movedone");
+		self moveto(self.origin + (0,0,-20),randomfloatrange(0.5,4));
+		self waittill("movedone");
 	}
 }
 
@@ -617,11 +643,10 @@ PlayerTrialHandlerTime(trial, Points, SpecificZone){
 	}
 }
 
-PodiumSetupTrigger(ModelOrigin,Index){
+PodiumSetupTrigger(CalculatedOrigin,Index){
 	level endon("end_game");
 	trigger = Spawn( "trigger_radius", self.origin + (0, 0, 30), 0, 30, 30 );
 	trigger SetCursorHint( "HINT_NOICON" );
-	CalculatedOrigin = ModelOrigin + (0,10,18);
 	trigger thread ShowToSpecific(CalculatedOrigin,Index);
 	while(1){
 		players = GetPlayers();
@@ -1118,7 +1143,7 @@ set_trial_reward(tier) {
     self.trials_legend.alpha = alpha[3];
     
     // Trigger trial challenge text overwrite or reset
-    if (tier == "legendary" || previous == "legendary")
+    if (tier == "legendary" )
         set_trial_challenge(self.trials_challenge_text);
 }
 
@@ -1184,8 +1209,12 @@ ShowToSpecific(FXOrigin,Index){
 		self SetInvisibleToAll(); 
 		self SetVisibleToPlayer( GetPlayers()[Index] );
 		if(isdefined(GetPlayers()[Index])){
-			if(isdefined(GetPlayers()[Index].ReaperTrialsCurrentMagic) && GetPlayers()[Index].ReaperTrialsCurrentMagic >= 25)
-				playfx( level._effect[ "character_fire_death_sm" ], FXOrigin);
+			if(isdefined(GetPlayers()[Index].ReaperTrialsCurrentMagic) && GetPlayers()[Index].ReaperTrialsCurrentMagic >= 25){
+				if(level.script == "zm_transit")
+					playfx( level._effect[ "character_fire_death_sm" ], FXOrigin);
+				else if(level.script == "zm_prison")
+					playfx(level._effect[ "fx_alcatraz_elec_chair" ],FXOrigin - (17,0,15),anglesToForward(0,0,0), anglesToUp(0,0,0));// Too Lazy
+			}
 		}
 		wait 5;
 	}
