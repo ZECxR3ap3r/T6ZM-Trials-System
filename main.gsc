@@ -495,10 +495,10 @@ set_trial_location(zone, out_text, in_text) {
 
 		if (before != in_zone) {
 			text = in_zone ? in_text : out_text;
-			players[i] set_trial_challenge(text);
+			self set_trial_challenge(text);
+            before = in_zone;
 		}
 
-        before = in_zone;
 		wait .5;
 	}
 }
