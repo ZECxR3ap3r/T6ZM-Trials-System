@@ -9,7 +9,3 @@
 - Mob of the Dead
 - Buried
 - Origins
-
-## Credits
-- John Kramer
-- Jbleezy

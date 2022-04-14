@@ -1112,508 +1112,275 @@ show_only_to_player(num)
 	}
 }
 
-// Credits to Jbleezy
-get_zone_name(zone)
-{
-	if(level.script == "zm_transit")
-	{
-		if(zone == "zone_pri")
-			name = "Bus Depot";
-		else if (zone == "zone_pri2")
-			name = "Bus Depot Hallway";
-		else if (zone == "zone_station_ext")
-			name = "Outside Bus Depot";
-		else if (zone == "zone_trans_2b")
-			name = "Fog After Bus Depot";
-		else if (zone == "zone_trans_2")
-			name = "Tunnel Entrance";
-		else if (zone == "zone_amb_tunnel")
-			name = "Tunnel";
-		else if (zone == "zone_trans_3")
-			name = "Tunnel Exit";
-		else if (zone == "zone_roadside_west")
-			name = "Outside Diner";
-		else if (zone == "zone_gas")
-			name = "Gas Station";
-		else if (zone == "zone_roadside_east")
-			name = "Outside Garage";
-		else if (zone == "zone_trans_diner")
-			name = "Fog Outside Diner";
-		else if (zone == "zone_trans_diner2")
-			name = "Fog Outside Garage";
-		else if (zone == "zone_gar")
-			name = "Garage";
-		else if (zone == "zone_din")
-			name = "Diner";
-		else if (zone == "zone_diner_roof")
-			name = "Diner Roof";
-		else if (zone == "zone_trans_4")
-			name = "Fog After Diner";
-		else if (zone == "zone_amb_forest")
-			name = "Forest";
-		else if (zone == "zone_trans_10")
-			name = "Outside Church";
-		else if (zone == "zone_town_church")
-			name = "Upper South Town";
-		else if (zone == "zone_trans_5")
-			name = "Fog Before Farm";
-		else if (zone == "zone_far")
-			name = "Outside Farm";
-		else if (zone == "zone_far_ext")
-			name = "Farm";
-		else if (zone == "zone_brn")
-			name = "Barn";
-		else if (zone == "zone_farm_house")
-			name = "Farmhouse";
-		else if (zone == "zone_trans_6")
-			name = "Fog After Farm";
-		else if (zone == "zone_amb_cornfield")
-			name = "Cornfield";
-		else if (zone == "zone_cornfield_prototype")
-			name = "Nacht der Untoten";
-		else if (zone == "zone_trans_7")
-			name = "Upper Fog Before Power";
-		else if (zone == "zone_trans_pow_ext1")
-			name = "Fog Before Power";
-		else if (zone == "zone_pow")
-			name = "Outside Power Station";
-		else if (zone == "zone_prr")
-			name = "Power Station";
-		else if (zone == "zone_pcr")
-			name = "Power Control Room";
-		else if (zone == "zone_pow_warehouse")
-			name = "Warehouse";
-		else if (zone == "zone_trans_8")
-			name = "Fog After Power";
-		else if (zone == "zone_amb_power2town")
-			name = "Cabin";
-		else if (zone == "zone_trans_9")
-			name = "Fog Before Town";
-		else if (zone == "zone_town_north")
-			name = "North Town";
-		else if (zone == "zone_tow")
-			name = "Center Town";
-		else if (zone == "zone_town_east")
-			name = "East Town";
-		else if (zone == "zone_town_west")
-			name = "West Town";
-		else if (zone == "zone_town_south")
-			name = "South Town";
-		else if (zone == "zone_bar")
-			name = "Bar";
-		else if (zone == "zone_town_barber")
-			name = "Bookstore";
-		else if (zone == "zone_ban")
-			name = "Bank";
-		else if (zone == "zone_ban_vault")
-			name = "Bank Vault";
-		else if (zone == "zone_tbu")
-			name = "Lab";
-		else if (zone == "zone_trans_11")
-			name = "Fog After Town";
-		else if (zone == "zone_amb_bridge")
-			name = "Bridge";
-		else if (zone == "zone_trans_1")
-			name = "Fog Before Bus Depot";
-	}
-	else if (level.script == "zm_nuked")
-	{
-		if (zone == "culdesac_yellow_zone")
-			name = "Yellow House Cul-de-sac";
-		else if (zone == "culdesac_green_zone")
-			name = "Green House Cul-de-sac";
-		else if (zone == "truck_zone")
-			name = "Truck";
-		else if (zone == "openhouse1_f1_zone")
-			name = "Green House Downstairs";
-		else if (zone == "openhouse1_f2_zone")
-			name = "Green House Upstairs";
-		else if (zone == "openhouse1_backyard_zone")
-			name = "Green House Backyard";
-		else if (zone == "openhouse2_f1_zone")
-			name = "Yellow House Downstairs";
-		else if (zone == "openhouse2_f2_zone")
-			name = "Yellow House Upstairs";
-		else if (zone == "openhouse2_backyard_zone")
-			name = "Yellow House Backyard";
-		else if (zone == "ammo_door_zone")
-			name = "Yellow House Backyard Door";
-	}
-	else if (level.script == "zm_highrise")
-	{
-		if (zone == "zone_green_start")
-			name = "Green Highrise Level 3b";
-		else if (zone == "zone_green_escape_pod")
-			name = "Escape Pod";
-		else if (zone == "zone_green_escape_pod_ground")
-			name = "Escape Pod Shaft";
-		else if (zone == "zone_green_level1")
-			name = "Green Highrise Level 3a";
-		else if (zone == "zone_green_level2a")
-			name = "Green Highrise Level 2a";
-		else if (zone == "zone_green_level2b")
-			name = "Green Highrise Level 2b";
-		else if (zone == "zone_green_level3a")
-			name = "Green Highrise Restaurant";
-		else if (zone == "zone_green_level3b")
-			name = "Green Highrise Level 1a";
-		else if (zone == "zone_green_level3c")
-			name = "Green Highrise Level 1b";
-		else if (zone == "zone_green_level3d")
-			name = "Green Highrise Behind Restaurant";
-		else if (zone == "zone_orange_level1")
-			name = "Upper Orange Highrise Level 2";
-		else if (zone == "zone_orange_level2")
-			name = "Upper Orange Highrise Level 1";
-		else if (zone == "zone_orange_elevator_shaft_top")
-			name = "Elevator Shaft Level 3";
-		else if (zone == "zone_orange_elevator_shaft_middle_1")
-			name = "Elevator Shaft Level 2";
-		else if (zone == "zone_orange_elevator_shaft_middle_2")
-			name = "Elevator Shaft Level 1";
-		else if (zone == "zone_orange_elevator_shaft_bottom")
-			name = "Elevator Shaft Bottom";
-		else if (zone == "zone_orange_level3a")
-			name = "Lower Orange Highrise Level 1a";
-		else if (zone == "zone_orange_level3b")
-			name = "Lower Orange Highrise Level 1b";
-		else if (zone == "zone_blue_level5")
-			name = "Lower Blue Highrise Level 1";
-		else if (zone == "zone_blue_level4a")
-			name = "Lower Blue Highrise Level 2a";
-		else if (zone == "zone_blue_level4b")
-			name = "Lower Blue Highrise Level 2b";
-		else if (zone == "zone_blue_level4c")
-			name = "Lower Blue Highrise Level 2c";
-		else if (zone == "zone_blue_level2a")
-			name = "Upper Blue Highrise Level 1a";
-		else if (zone == "zone_blue_level2b")
-			name = "Upper Blue Highrise Level 1b";
-		else if (zone == "zone_blue_level2c")
-			name = "Upper Blue Highrise Level 1c";
-		else if (zone == "zone_blue_level2d")
-			name = "Upper Blue Highrise Level 1d";
-		else if (zone == "zone_blue_level1a")
-			name = "Upper Blue Highrise Level 2a";
-		else if (zone == "zone_blue_level1b")
-			name = "Upper Blue Highrise Level 2b";
-		else if (zone == "zone_blue_level1c")
-			name = "Upper Blue Highrise Level 2c";
-	}
-	else if (level.script == "zm_prison")
-	{
-		if (zone == "zone_start")
-			name = "D-Block";
-		else if (zone == "zone_library")
-			name = "Library";
-		else if (zone == "zone_cellblock_west")
-			name = "Cellblock 2nd Floor";
-		else if (zone == "zone_cellblock_west_gondola")
-			name = "Cellblock 3rd Floor";
-		else if (zone == "zone_cellblock_west_gondola_dock")
-			name = "Cellblock Gondola";
-		else if (zone == "zone_cellblock_west_barber")
-			name = "Michigan Avenue";
-		else if (zone == "zone_cellblock_east")
-			name = "Times Square";
-		else if (zone == "zone_cafeteria")
-			name = "Cafeteria";
-		else if (zone == "zone_cafeteria_end")
-			name = "Cafeteria End";
-		else if (zone == "zone_infirmary")
-			name = "Infirmary 1";
-		else if (zone == "zone_infirmary_roof")
-			name = "Infirmary 2";
-		else if (zone == "zone_roof_infirmary")
-			name = "Roof 1";
-		else if (zone == "zone_roof")
-			name = "Roof 2";
-		else if (zone == "zone_cellblock_west_warden")
-			name = "Sally Port";
-		else if (zone == "zone_warden_office")
-			name = "Warden's Office";
-		else if (zone == "cellblock_shower")
-			name = "Showers";
-		else if (zone == "zone_citadel_shower")
-			name = "Citadel To Showers";
-		else if (zone == "zone_citadel")
-			name = "Citadel";
-		else if (zone == "zone_citadel_warden")
-			name = "Citadel To Warden's Office";
-		else if (zone == "zone_citadel_stairs")
-			name = "Citadel Tunnels";
-		else if (zone == "zone_citadel_basement")
-			name = "Citadel Basement";
-		else if (zone == "zone_citadel_basement_building")
-			name = "China Alley";
-		else if (zone == "zone_studio")
-			name = "Building 64";
-		else if (zone == "zone_dock")
-			name = "Docks";
-		else if (zone == "zone_dock_puzzle")
-			name = "Docks Gates";
-		else if (zone == "zone_dock_gondola")
-			name = "Upper Docks";
-		else if (zone == "zone_golden_gate_bridge")
-			name = "Golden Gate Bridge";
-		else if (zone == "zone_gondola_ride")
-			name = "Gondola";
-	}
-	else if (level.script == "zm_buried")
-	{
-		if (zone == "zone_start")
-			name = "Processing";
-		else if (zone == "zone_start_lower")
-			name = "Lower Processing";
-		else if (zone == "zone_tunnels_center")
-			name = "Center Tunnels";
-		else if (zone == "zone_tunnels_north")
-			name = "Courthouse Tunnels 2";
-		else if (zone == "zone_tunnels_north2")
-			name = "Courthouse Tunnels 1";
-		else if (zone == "zone_tunnels_south")
-			name = "Saloon Tunnels 3";
-		else if (zone == "zone_tunnels_south2")
-			name = "Saloon Tunnels 2";
-		else if (zone == "zone_tunnels_south3")
-			name = "Saloon Tunnels 1";
-		else if (zone == "zone_street_lightwest")
-			name = "Outside General Store & Bank";
-		else if (zone == "zone_street_lightwest_alley")
-			name = "Outside General Store & Bank Alley";
-		else if (zone == "zone_morgue_upstairs")
-			name = "Morgue";
-		else if (zone == "zone_underground_jail")
-			name = "Jail Downstairs";
-		else if (zone == "zone_underground_jail2")
-			name = "Jail Upstairs";
-		else if (zone == "zone_general_store")
-			name = "General Store";
-		else if (zone == "zone_stables")
-			name = "Stables";
-		else if (zone == "zone_street_darkwest")
-			name = "Outside Gunsmith";
-		else if (zone == "zone_street_darkwest_nook")
-			name = "Outside Gunsmith Nook";
-		else if (zone == "zone_gun_store")
-			name = "Gunsmith";
-		else if (zone == "zone_bank")
-			name = "Bank";
-		else if (zone == "zone_tunnel_gun2stables")
-			name = "Stables To Gunsmith Tunnel 2";
-		else if (zone == "zone_tunnel_gun2stables2")
-			name = "Stables To Gunsmith Tunnel";
-		else if (zone == "zone_street_darkeast")
-			name = "Outside Saloon & Toy Store";
-		else if (zone == "zone_street_darkeast_nook")
-			name = "Outside Saloon & Toy Store Nook";
-		else if (zone == "zone_underground_bar")
-			name = "Saloon";
-		else if (zone == "zone_tunnel_gun2saloon")
-			name = "Saloon To Gunsmith Tunnel";
-		else if (zone == "zone_toy_store")
-			name = "Toy Store Downstairs";
-		else if (zone == "zone_toy_store_floor2")
-			name = "Toy Store Upstairs";
-		else if (zone == "zone_toy_store_tunnel")
-			name = "Toy Store Tunnel";
-		else if (zone == "zone_candy_store")
-			name = "Candy Store Downstairs";
-		else if (zone == "zone_candy_store_floor2")
-			name = "Candy Store Upstairs";
-		else if (zone == "zone_street_lighteast")
-			name = "Outside Courthouse & Candy Store";
-		else if (zone == "zone_underground_courthouse")
-			name = "Courthouse Downstairs";
-		else if (zone == "zone_underground_courthouse2")
-			name = "Courthouse Upstairs";
-		else if (zone == "zone_street_fountain")
-			name = "Fountain";
-		else if (zone == "zone_church_graveyard")
-			name = "Graveyard";
-		else if (zone == "zone_church_main")
-			name = "Church Downstairs";
-		else if (zone == "zone_church_upstairs")
-			name = "Church Upstairs";
-		else if (zone == "zone_mansion_lawn")
-			name = "Mansion Lawn";
-		else if (zone == "zone_mansion")
-			name = "Mansion";
-		else if (zone == "zone_mansion_backyard")
-			name = "Mansion Backyard";
-		else if (zone == "zone_maze")
-			name = "Maze";
-		else if (zone == "zone_maze_staircase")
-			name = "Maze Staircase";
-	}
-	else if (level.script == "zm_tomb")
-	{
-		if (zone == "zone_start")
-			name = "Lower Laboratory";
-		else if (zone == "zone_start_a")
-			name = "Upper Laboratory";
-		else if (zone == "zone_start_b")
-			name = "Generator 1";
-		else if (zone == "zone_bunker_1a")
-			name = "Generator 3 Bunker 1";
-		else if (zone == "zone_fire_stairs")
-			name = "Fire Tunnel";
-		else if (zone == "zone_bunker_1")
-			name = "Generator 3 Bunker 2";
-		else if (zone == "zone_bunker_3a")
-			name = "Generator 3";
-		else if (zone == "zone_bunker_3b")
-			name = "Generator 3 Bunker 3";
-		else if (zone == "zone_bunker_2a")
-			name = "Generator 2 Bunker 1";
-		else if (zone == "zone_bunker_2")
-			name = "Generator 2 Bunker 2";
-		else if (zone == "zone_bunker_4a")
-			name = "Generator 2";
-		else if (zone == "zone_bunker_4b")
-			name = "Generator 2 Bunker 3";
-		else if (zone == "zone_bunker_4c")
-			name = "Tank Station";
-		else if (zone == "zone_bunker_4d")
-			name = "Above Tank Station";
-		else if (zone == "zone_bunker_tank_c")
-			name = "Generator 2 Tank Route 1";
-		else if (zone == "zone_bunker_tank_c1")
-			name = "Generator 2 Tank Route 2";
-		else if (zone == "zone_bunker_4e")
-			name = "Generator 2 Tank Route 3";
-		else if (zone == "zone_bunker_tank_d")
-			name = "Generator 2 Tank Route 4";
-		else if (zone == "zone_bunker_tank_d1")
-			name = "Generator 2 Tank Route 5";
-		else if (zone == "zone_bunker_4f")
-			name = "zone_bunker_4f";
-		else if (zone == "zone_bunker_5a")
-			name = "Workshop Downstairs";
-		else if (zone == "zone_bunker_5b")
-			name = "Workshop Upstairs";
-		else if (zone == "zone_nml_2a")
-			name = "No Man's Land Walkway";
-		else if (zone == "zone_nml_2")
-			name = "No Man's Land Entrance";
-		else if (zone == "zone_bunker_tank_e")
-			name = "Generator 5 Tank Route 1";
-		else if (zone == "zone_bunker_tank_e1")
-			name = "Generator 5 Tank Route 2";
-		else if (zone == "zone_bunker_tank_e2")
-			name = "zone_bunker_tank_e2";
-		else if (zone == "zone_bunker_tank_f")
-			name = "Generator 5 Tank Route 3";
-		else if (zone == "zone_nml_1")
-			name = "Generator 5 Tank Route 4";
-		else if (zone == "zone_nml_4")
-			name = "Generator 5 Tank Route 5";
-		else if (zone == "zone_nml_0")
-			name = "Generator 5 Left Footstep";
-		else if (zone == "zone_nml_5")
-			name = "Generator 5 Right Footstep Walkway";
-		else if (zone == "zone_nml_farm")
-			name = "Generator 5";
-		else if (zone == "zone_nml_celllar")
-			name = "Generator 5 Cellar";
-		else if (zone == "zone_bolt_stairs")
-			name = "Lightning Tunnel";
-		else if (zone == "zone_nml_3")
-			name = "No Man's Land 1st Right Footstep";
-		else if (zone == "zone_nml_2b")
-			name = "No Man's Land Stairs";
-		else if (zone == "zone_nml_6")
-			name = "No Man's Land Left Footstep";
-		else if (zone == "zone_nml_8")
-			name = "No Man's Land 2nd Right Footstep";
-		else if (zone == "zone_nml_10a")
-			name = "Generator 4 Tank Route 1";
-		else if (zone == "zone_nml_10")
-			name = "Generator 4 Tank Route 2";
-		else if (zone == "zone_nml_7")
-			name = "Generator 4 Tank Route 3";
-		else if (zone == "zone_bunker_tank_a")
-			name = "Generator 4 Tank Route 4";
-		else if (zone == "zone_bunker_tank_a1")
-			name = "Generator 4 Tank Route 5";
-		else if (zone == "zone_bunker_tank_a2")
-			name = "zone_bunker_tank_a2";
-		else if (zone == "zone_bunker_tank_b")
-			name = "Generator 4 Tank Route 6";
-		else if (zone == "zone_nml_9")
-			name = "Generator 4 Left Footstep";
-		else if (zone == "zone_air_stairs")
-			name = "Wind Tunnel";
-		else if (zone == "zone_nml_11")
-			name = "Generator 4";
-		else if (zone == "zone_nml_12")
-			name = "Generator 4 Right Footstep";
-		else if (zone == "zone_nml_16")
-			name = "Excavation Site Front Path";
-		else if (zone == "zone_nml_17")
-			name = "Excavation Site Back Path";
-		else if (zone == "zone_nml_18")
-			name = "Excavation Site Level 3";
-		else if (zone == "zone_nml_19")
-			name = "Excavation Site Level 2";
-		else if (zone == "ug_bottom_zone")
-			name = "Excavation Site Level 1";
-		else if (zone == "zone_nml_13")
-			name = "Generator 5 To Generator 6 Path";
-		else if (zone == "zone_nml_14")
-			name = "Generator 4 To Generator 6 Path";
-		else if (zone == "zone_nml_15")
-			name = "Generator 6 Entrance";
-		else if (zone == "zone_village_0")
-			name = "Generator 6 Left Footstep";
-		else if (zone == "zone_village_5")
-			name = "Generator 6 Tank Route 1";
-		else if (zone == "zone_village_5a")
-			name = "Generator 6 Tank Route 2";
-		else if (zone == "zone_village_5b")
-			name = "Generator 6 Tank Route 3";
-		else if (zone == "zone_village_1")
-			name = "Generator 6 Tank Route 4";
-		else if (zone == "zone_village_4b")
-			name = "Generator 6 Tank Route 5";
-		else if (zone == "zone_village_4a")
-			name = "Generator 6 Tank Route 6";
-		else if (zone == "zone_village_4")
-			name = "Generator 6 Tank Route 7";
-		else if (zone == "zone_village_2")
-			name = "Church";
-		else if (zone == "zone_village_3")
-			name = "Generator 6 Right Footstep";
-		else if (zone == "zone_village_3a")
-			name = "Generator 6";
-		else if (zone == "zone_ice_stairs")
-			name = "Ice Tunnel";
-		else if (zone == "zone_bunker_6")
-			name = "Above Generator 3 Bunker";
-		else if (zone == "zone_nml_20")
-			name = "Above No Man's Land";
-		else if (zone == "zone_village_6")
-			name = "Behind Church";
-		else if (zone == "zone_chamber_0")
-			name = "The Crazy Place Lightning Chamber";
-		else if (zone == "zone_chamber_1")
-			name = "The Crazy Place Lightning & Ice";
-		else if (zone == "zone_chamber_2")
-			name = "The Crazy Place Ice Chamber";
-		else if (zone == "zone_chamber_3")
-			name = "The Crazy Place Fire & Lightning";
-		else if (zone == "zone_chamber_4")
-			name = "The Crazy Place Center";
-		else if (zone == "zone_chamber_5")
-			name = "The Crazy Place Ice & Wind";
-		else if (zone == "zone_chamber_6")
-			name = "The Crazy Place Fire Chamber";
-		else if (zone == "zone_chamber_7")
-			name = "The Crazy Place Wind & Fire";
-		else if (zone == "zone_chamber_8")
-			name = "The Crazy Place Wind Chamber";
-		else if (zone == "zone_robot_head")
-			name = "Robot's Head";
-	}
-	return name;
+get_zone_name(key) {
+
+    // Caching and array lookup is way more efficient
+    if (isdefined(level.zone_names))
+        return level.zone_names[key];
+
+    level.zone_names = [];
+
+    switch(level.script) {
+
+        case "zm_transit":
+            level.zone_names["zone_pri"] = "Bus Depot";
+            level.zone_names["zone_pri2"] = "Bus Depot Hallway";
+            level.zone_names["zone_station_ext"] = "Outside Bus Depot";
+            level.zone_names["zone_trans_2b"] = "Road After Bus Depot";
+            level.zone_names["zone_trans_2"] = "Tunnel Entrance";
+            level.zone_names["zone_amb_tunnel"] = "Tunnel";
+            level.zone_names["zone_trans_3"] = "Tunnel Exit";
+            level.zone_names["zone_roadside_west"] = "Outside Diner";
+            level.zone_names["zone_gas"] = "Gas Station";
+            level.zone_names["zone_roadside_east"] = "Outside Garage";
+            level.zone_names["zone_trans_diner"] = "Road Outside Diner";
+            level.zone_names["zone_trans_diner2"] = "Road Outside Garage";
+            level.zone_names["zone_gar"] = "Garage";
+            level.zone_names["zone_din"] = "Diner";
+            level.zone_names["zone_diner_roof"] = "Diner Roof";
+            level.zone_names["zone_trans_4"] = "Road After Diner";
+            level.zone_names["zone_amb_forest"] = "Forest";
+            level.zone_names["zone_trans_10"] = "Outside Church";
+            level.zone_names["zone_town_church"] = "Upper South Town";
+            level.zone_names["zone_trans_5"] = "Road Before Farm";
+            level.zone_names["zone_far"] = "Outside Farm";
+            level.zone_names["zone_far_ext"] = "Farm";
+            level.zone_names["zone_brn"] = "Barn";
+            level.zone_names["zone_farm_house"] = "Farmhouse";
+            level.zone_names["zone_trans_6"] = "Road After Farm";
+            level.zone_names["zone_amb_cornfield"] = "Cornfield";
+            level.zone_names["zone_cornfield_prototype"] = "Nacht der Untoten";
+            level.zone_names["zone_trans_7"] = "Upper Road Before Power";
+            level.zone_names["zone_trans_pow_ext1"] = "Road Before Power";
+            level.zone_names["zone_pow"] = "Outside Power Station";
+            level.zone_names["zone_prr"] = "Power Station";
+            level.zone_names["zone_pcr"] = "Power Control Room";
+            level.zone_names["zone_pow_warehouse"] = "Warehouse";
+            level.zone_names["zone_trans_8"] = "Road After Power";
+            level.zone_names["zone_amb_power2town"] = "Cabin";
+            level.zone_names["zone_trans_9"] = "Road Before Town";
+            level.zone_names["zone_town_north"] = "North Town";
+            level.zone_names["zone_tow"] = "Center Town";
+            level.zone_names["zone_town_east"] = "East Town";
+            level.zone_names["zone_town_west"] = "West Town";
+            level.zone_names["zone_town_south"] = "South Town";
+            level.zone_names["zone_bar"] = "Bar";
+            level.zone_names["zone_town_barber"] = "Bookstore";
+            level.zone_names["zone_ban"] = "Bank";
+            level.zone_names["zone_ban_vault"] = "Bank Vault";
+            level.zone_names["zone_tbu"] = "Laboratory";
+            level.zone_names["zone_trans_11"] = "Road After Town";
+            level.zone_names["zone_amb_bridge"] = "Bridge";
+            level.zone_names["zone_trans_1"] = "Road Before Bus Depot";
+            break;
+
+        case "zm_nuked":
+            level.zone_names["culdesac_yellow_zone"] = "Yellow House Cul-de-sac";
+            level.zone_names["culdesac_green_zone"] = "Green House Cul-de-sac";
+            level.zone_names["truck_zone"] = "Truck";
+            level.zone_names["openhouse1_f1_zone"] = "Green House Downstairs";
+            level.zone_names["openhouse1_f2_zone"] = "Green House Upstairs";
+            level.zone_names["openhouse1_backyard_zone"] = "Green House Backyard";
+            level.zone_names["openhouse2_f1_zone"] = "Yellow House Downstairs";
+            level.zone_names["openhouse2_f2_zone"] = "Yellow House Upstairs";
+            level.zone_names["openhouse2_backyard_zone"] = "Yellow House Backyard";
+            level.zone_names["ammo_door_zone"] = "Yellow House Backyard Door";
+            break;
+
+        case "zm_highrise":
+            level.zone_names["zone_green_start"] = "Green Highrise Level 3b";
+            level.zone_names["zone_green_escape_pod"] = "Escape Pod";
+            level.zone_names["zone_green_escape_pod_ground"] = "Escape Pod Shaft";
+            level.zone_names["zone_green_level1"] = "Green Highrise Level 3a";
+            level.zone_names["zone_green_level2a"] = "Green Highrise Level 2a";
+            level.zone_names["zone_green_level2b"] = "Green Highrise Level 2b";
+            level.zone_names["zone_green_level3a"] = "Green Highrise Restaurant";
+            level.zone_names["zone_green_level3b"] = "Green Highrise Level 1a";
+            level.zone_names["zone_green_level3c"] = "Green Highrise Level 1b";
+            level.zone_names["zone_green_level3d"] = "Green Highrise Behind Restaurant";
+            level.zone_names["zone_orange_level1"] = "Upper Orange Highrise Level 2";
+            level.zone_names["zone_orange_level2"] = "Upper Orange Highrise Level 1";
+            level.zone_names["zone_orange_elevator_shaft_top"] = "Elevator Shaft Level 3";
+            level.zone_names["zone_orange_elevator_shaft_middle_1"] = "Elevator Shaft Level 2";
+            level.zone_names["zone_orange_elevator_shaft_middle_2"] = "Elevator Shaft Level 1";
+            level.zone_names["zone_orange_elevator_shaft_bottom"] = "Elevator Shaft Bottom";
+            level.zone_names["zone_orange_level3a"] = "Lower Orange Highrise Level 1a";
+            level.zone_names["zone_orange_level3b"] = "Lower Orange Highrise Level 1b";
+            level.zone_names["zone_blue_level5"] = "Lower Blue Highrise Level 1";
+            level.zone_names["zone_blue_level4a"] = "Lower Blue Highrise Level 2a";
+            level.zone_names["zone_blue_level4b"] = "Lower Blue Highrise Level 2b";
+            level.zone_names["zone_blue_level4c"] = "Lower Blue Highrise Level 2c";
+            level.zone_names["zone_blue_level2a"] = "Upper Blue Highrise Level 1a";
+            level.zone_names["zone_blue_level2b"] = "Upper Blue Highrise Level 1b";
+            level.zone_names["zone_blue_level2c"] = "Upper Blue Highrise Level 1c";
+            level.zone_names["zone_blue_level2d"] = "Upper Blue Highrise Level 1d";
+            level.zone_names["zone_blue_level1a"] = "Upper Blue Highrise Level 2a";
+            level.zone_names["zone_blue_level1b"] = "Upper Blue Highrise Level 2b";
+            level.zone_names["zone_blue_level1c"] = "Upper Blue Highrise Level 2c";
+            break;
+
+        case "zm_prison":
+            level.zone_names["zone_start"] = "D-Block";
+            level.zone_names["zone_library"] = "Library";
+            level.zone_names["zone_cellblock_west"] = "Cellblock 2nd Floor";
+            level.zone_names["zone_cellblock_west_gondola"] = "Cellblock 3rd Floor";
+            level.zone_names["zone_cellblock_west_gondola_dock"] = "Cellblock Gondola";
+            level.zone_names["zone_cellblock_west_barber"] = "Michigan Avenue";
+            level.zone_names["zone_cellblock_east"] = "Times Square";
+            level.zone_names["zone_cafeteria"] = "Cafeteria";
+            level.zone_names["zone_cafeteria_end"] = "Cafeteria End";
+            level.zone_names["zone_infirmary"] = "Infirmary 1";
+            level.zone_names["zone_infirmary_roof"] = "Infirmary 2";
+            level.zone_names["zone_roof_infirmary"] = "Roof 1";
+            level.zone_names["zone_roof"] = "Roof 2";
+            level.zone_names["zone_cellblock_west_warden"] = "Sally Port";
+            level.zone_names["zone_warden_office"] = "Warden's Office";
+            level.zone_names["cellblock_shower"] = "Showers";
+            level.zone_names["zone_citadel_shower"] = "Citadel To Showers";
+            level.zone_names["zone_citadel"] = "Citadel";
+            level.zone_names["zone_citadel_warden"] = "Citadel To Warden's Office";
+            level.zone_names["zone_citadel_stairs"] = "Citadel Tunnels";
+            level.zone_names["zone_citadel_basement"] = "Citadel Basement";
+            level.zone_names["zone_citadel_basement_building"] = "China Alley";
+            level.zone_names["zone_studio"] = "Building 64";
+            level.zone_names["zone_dock"] = "Docks";
+            level.zone_names["zone_dock_puzzle"] = "Docks Gates";
+            level.zone_names["zone_dock_gondola"] = "Upper Docks";
+            level.zone_names["zone_golden_gate_bridge"] = "Golden Gate Bridge";
+            level.zone_names["zone_gondola_ride"] = "Gondola";
+            break;
+
+        case "zm_buried":
+            level.zone_names["zone_start"] = "Processing";
+            level.zone_names["zone_start_lower"] = "Lower Processing";
+            level.zone_names["zone_tunnels_center"] = "Center Tunnels";
+            level.zone_names["zone_tunnels_north"] = "Courthouse Tunnels 2";
+            level.zone_names["zone_tunnels_north2"] = "Courthouse Tunnels 1";
+            level.zone_names["zone_tunnels_south"] = "Saloon Tunnels 3";
+            level.zone_names["zone_tunnels_south2"] = "Saloon Tunnels 2";
+            level.zone_names["zone_tunnels_south3"] = "Saloon Tunnels 1";
+            level.zone_names["zone_street_lightwest"] = "Outside General Store & Bank";
+            level.zone_names["zone_street_lightwest_alley"] = "Outside General Store & Bank Alley";
+            level.zone_names["zone_morgue_upstairs"] = "Morgue";
+            level.zone_names["zone_underground_jail"] = "Jail Downstairs";
+            level.zone_names["zone_underground_jail2"] = "Jail Upstairs";
+            level.zone_names["zone_general_store"] = "General Store";
+            level.zone_names["zone_stables"] = "Stables";
+            level.zone_names["zone_street_darkwest"] = "Outside Gunsmith";
+            level.zone_names["zone_street_darkwest_nook"] = "Outside Gunsmith Nook";
+            level.zone_names["zone_gun_store"] = "Gunsmith";
+            level.zone_names["zone_bank"] = "Bank";
+            level.zone_names["zone_tunnel_gun2stables"] = "Stables To Gunsmith Tunnel 2";
+            level.zone_names["zone_tunnel_gun2stables2"] = "Stables To Gunsmith Tunnel";
+            level.zone_names["zone_street_darkeast"] = "Outside Saloon & Toy Store";
+            level.zone_names["zone_street_darkeast_nook"] = "Outside Saloon & Toy Store Nook";
+            level.zone_names["zone_underground_bar"] = "Saloon";
+            level.zone_names["zone_tunnel_gun2saloon"] = "Saloon To Gunsmith Tunnel";
+            level.zone_names["zone_toy_store"] = "Toy Store Downstairs";
+            level.zone_names["zone_toy_store_floor2"] = "Toy Store Upstairs";
+            level.zone_names["zone_toy_store_tunnel"] = "Toy Store Tunnel";
+            level.zone_names["zone_candy_store"] = "Candy Store Downstairs";
+            level.zone_names["zone_candy_store_floor2"] = "Candy Store Upstairs";
+            level.zone_names["zone_street_lighteast"] = "Outside Courthouse & Candy Store";
+            level.zone_names["zone_underground_courthouse"] = "Courthouse Downstairs";
+            level.zone_names["zone_underground_courthouse2"] = "Courthouse Upstairs";
+            level.zone_names["zone_street_fountain"] = "Fountain";
+            level.zone_names["zone_church_graveyard"] = "Graveyard";
+            level.zone_names["zone_church_main"] = "Church Downstairs";
+            level.zone_names["zone_church_upstairs"] = "Church Upstairs";
+            level.zone_names["zone_mansion_lawn"] = "Mansion Lawn";
+            level.zone_names["zone_mansion"] = "Mansion";
+            level.zone_names["zone_mansion_backyard"] = "Mansion Backyard";
+            level.zone_names["zone_maze"] = "Maze";
+            level.zone_names["zone_maze_staircase"] = "Maze Staircase";
+            break;
+
+        case "zm_tomb":
+            level.zone_names["zone_start"] = "Lower Laboratory";
+            level.zone_names["zone_start_a"] = "Upper Laboratory";
+            level.zone_names["zone_start_b"] = "Generator 1";
+            level.zone_names["zone_bunker_1a"] = "Generator 3 Bunker 1";
+            level.zone_names["zone_fire_stairs"] = "Fire Tunnel";
+            level.zone_names["zone_bunker_1"] = "Generator 3 Bunker 2";
+            level.zone_names["zone_bunker_3a"] = "Generator 3";
+            level.zone_names["zone_bunker_3b"] = "Generator 3 Bunker 3";
+            level.zone_names["zone_bunker_2a"] = "Generator 2 Bunker 1";
+            level.zone_names["zone_bunker_2"] = "Generator 2 Bunker 2";
+            level.zone_names["zone_bunker_4a"] = "Generator 2";
+            level.zone_names["zone_bunker_4b"] = "Generator 2 Bunker 3";
+            level.zone_names["zone_bunker_4c"] = "Tank Station";
+            level.zone_names["zone_bunker_4d"] = "Above Tank Station";
+            level.zone_names["zone_bunker_tank_c"] = "Generator 2 Tank Route 1";
+            level.zone_names["zone_bunker_tank_c1"] = "Generator 2 Tank Route 2";
+            level.zone_names["zone_bunker_4e"] = "Generator 2 Tank Route 3";
+            level.zone_names["zone_bunker_tank_d"] = "Generator 2 Tank Route 4";
+            level.zone_names["zone_bunker_tank_d1"] = "Generator 2 Tank Route 5";
+            level.zone_names["zone_bunker_4f"] = "zone_bunker_4f";
+            level.zone_names["zone_bunker_5a"] = "Workshop Downstairs";
+            level.zone_names["zone_bunker_5b"] = "Workshop Upstairs";
+            level.zone_names["zone_nml_2a"] = "No Man's Land Walkway";
+            level.zone_names["zone_nml_2"] = "No Man's Land Entrance";
+            level.zone_names["zone_bunker_tank_e"] = "Generator 5 Tank Route 1";
+            level.zone_names["zone_bunker_tank_e1"] = "Generator 5 Tank Route 2";
+            level.zone_names["zone_bunker_tank_e2"] = "zone_bunker_tank_e2";
+            level.zone_names["zone_bunker_tank_f"] = "Generator 5 Tank Route 3";
+            level.zone_names["zone_nml_1"] = "Generator 5 Tank Route 4";
+            level.zone_names["zone_nml_4"] = "Generator 5 Tank Route 5";
+            level.zone_names["zone_nml_0"] = "Generator 5 Left Footstep";
+            level.zone_names["zone_nml_5"] = "Generator 5 Right Footstep Walkway";
+            level.zone_names["zone_nml_farm"] = "Generator 5";
+            level.zone_names["zone_nml_celllar"] = "Generator 5 Cellar";
+            level.zone_names["zone_bolt_stairs"] = "Lightning Tunnel";
+            level.zone_names["zone_nml_3"] = "No Man's Land 1st Right Footstep";
+            level.zone_names["zone_nml_2b"] = "No Man's Land Stairs";
+            level.zone_names["zone_nml_6"] = "No Man's Land Left Footstep";
+            level.zone_names["zone_nml_8"] = "No Man's Land 2nd Right Footstep";
+            level.zone_names["zone_nml_10a"] = "Generator 4 Tank Route 1";
+            level.zone_names["zone_nml_10"] = "Generator 4 Tank Route 2";
+            level.zone_names["zone_nml_7"] = "Generator 4 Tank Route 3";
+            level.zone_names["zone_bunker_tank_a"] = "Generator 4 Tank Route 4";
+            level.zone_names["zone_bunker_tank_a1"] = "Generator 4 Tank Route 5";
+            level.zone_names["zone_bunker_tank_a2"] = "zone_bunker_tank_a2";
+            level.zone_names["zone_bunker_tank_b"] = "Generator 4 Tank Route 6";
+            level.zone_names["zone_nml_9"] = "Generator 4 Left Footstep";
+            level.zone_names["zone_air_stairs"] = "Wind Tunnel";
+            level.zone_names["zone_nml_11"] = "Generator 4";
+            level.zone_names["zone_nml_12"] = "Generator 4 Right Footstep";
+            level.zone_names["zone_nml_16"] = "Excavation Site Front Path";
+            level.zone_names["zone_nml_17"] = "Excavation Site Back Path";
+            level.zone_names["zone_nml_18"] = "Excavation Site Level 3";
+            level.zone_names["zone_nml_19"] = "Excavation Site Level 2";
+            level.zone_names["ug_bottom_zone"] = "Excavation Site Level 1";
+            level.zone_names["zone_nml_13"] = "Generator 5 To Generator 6 Path";
+            level.zone_names["zone_nml_14"] = "Generator 4 To Generator 6 Path";
+            level.zone_names["zone_nml_15"] = "Generator 6 Entrance";
+            level.zone_names["zone_village_0"] = "Generator 6 Left Footstep";
+            level.zone_names["zone_village_5"] = "Generator 6 Tank Route 1";
+            level.zone_names["zone_village_5a"] = "Generator 6 Tank Route 2";
+            level.zone_names["zone_village_5b"] = "Generator 6 Tank Route 3";
+            level.zone_names["zone_village_1"] = "Generator 6 Tank Route 4";
+            level.zone_names["zone_village_4b"] = "Generator 6 Tank Route 5";
+            level.zone_names["zone_village_4a"] = "Generator 6 Tank Route 6";
+            level.zone_names["zone_village_4"] = "Generator 6 Tank Route 7";
+            level.zone_names["zone_village_2"] = "Church";
+            level.zone_names["zone_village_3"] = "Generator 6 Right Footstep";
+            level.zone_names["zone_village_3a"] = "Generator 6";
+            level.zone_names["zone_ice_stairs"] = "Ice Tunnel";
+            level.zone_names["zone_bunker_6"] = "Above Generator 3 Bunker";
+            level.zone_names["zone_nml_20"] = "Above No Man's Land";
+            level.zone_names["zone_village_6"] = "Behind Church";
+            level.zone_names["zone_chamber_0"] = "The Crazy Place Lightning Chamber";
+            level.zone_names["zone_chamber_1"] = "The Crazy Place Lightning & Ice";
+            level.zone_names["zone_chamber_2"] = "The Crazy Place Ice Chamber";
+            level.zone_names["zone_chamber_3"] = "The Crazy Place Fire & Lightning";
+            level.zone_names["zone_chamber_4"] = "The Crazy Place Center";
+            level.zone_names["zone_chamber_5"] = "The Crazy Place Ice & Wind";
+            level.zone_names["zone_chamber_6"] = "The Crazy Place Fire Chamber";
+            level.zone_names["zone_chamber_7"] = "The Crazy Place Wind & Fire";
+            level.zone_names["zone_chamber_8"] = "The Crazy Place Wind Chamber";
+            level.zone_names["zone_robot_head"] = "Robot's Head";
+            break;
+    }
+
+    return level.zone_names[key];
 }
