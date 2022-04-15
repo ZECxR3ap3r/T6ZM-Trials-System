@@ -47,7 +47,7 @@ init() {
 	setDvar( "sv_cheats", 1 );
 	// Setup
 	if(level.script == "zm_transit"){
-		if(getDvar( "ui_zm_mapstartlocation" ) == "transit" || getDvar( "ui_zm_mapstartlocation" ) == "town"){
+		if(getDvar( "ui_zm_mapstartlocation" ) == "transit" && getDvar( "ui_zm_gamemodegroup" ) != "zsurvival"|| getDvar( "ui_zm_mapstartlocation" ) == "town"){
 			Collision = spawn( "script_model", (655.126, -281.746, -61.875));
 			Collision.angles = (0, 0, 0);
 			Collision setmodel("collision_wall_512x512x10_standard");
@@ -70,7 +70,7 @@ init() {
     		TrialsMainOrigin = (7683.7, -5559.19, 7.12722);
     		TrialsMainAngles = (0, 30, 0);
     	}
-    	else if ( getDvar( "ui_zm_mapstartlocation" ) == "station" ){
+    	else if ( getDvar( "ui_zm_mapstartlocation" ) == "transit" && getDvar( "ui_zm_gamemodegroup" ) == "zsurvival"){
 			Collision = spawn( "script_model", (-6298.53, 5449.84, 84.125));
 			Collision.angles = (0, 90, 0);
 			Collision setmodel("collision_wall_256x256x10_standard");
@@ -104,6 +104,19 @@ init() {
     	TrialsMainModel = "zombie_teddybear";
     	TrialsMainOrigin = (1634.18, 2214.07, 100.125);
     	TrialsMainAngles = (0, -110, 0);
+    	FXOriginOffset = (0,0,43);
+    }
+    else if(level.script == "zm_tomb"){
+    	Collision = spawn( "script_model", (401.108, 2118.76, -122.744));
+		Collision.angles = (0, 0, 0);
+		Collision setmodel("zm_collision_perks1");
+    	PodiumModel = "p6_zm_tm_challenge_box";
+    	PodiumOrigin = array((538.473, 2119.9, -127.875), (458.473, 2119.9, -127.875), (348.473, 2119.9, -127.875), (268.473, 2119.9, -127.875));
+    	PodiumAngles = array((0, 0, 0), (0, 0, 0), (0,0,0), (0,0,0));
+    	TrialsMainModel = "p6_zm_tm_puzzle_lever_switch";
+    	TrialsMainOrigin = (401.108, 2118.76, -122.744);
+    	TrialsMainAngles = (0, 0, 0);
+    	FXOriginOffset = (0,0,30);
     }
 	level.ReaperTrialsActive = 0;
 	level thread TrialsSystem(FXOriginOffset,PodiumModel, PodiumOrigin, PodiumAngles, TrialsMainModel, TrialsMainOrigin, TrialsMainAngles);
@@ -111,17 +124,35 @@ init() {
 	
 	// Rewards
 	// Powerups
+	if(level.script != "zm_tomb"){
+		AddReward("Common", "t6_wpn_pistol_m1911_world", "M1911", "m1911_zm", 0);
+		AddReward("Common", "t6_wpn_shotty_olympia_world", "Olympia", "rottweil72_zm", 0);
+		AddReward("Legendary", "t6_wpn_lmg_rpd_world", "RPD", "rpd_zm", 0);
+		AddReward("Epic", "t6_wpn_smg_mp5_world", "MP5", "mp5k_zm", 0);
+		AddReward("Rare", "t6_wpn_smg_mp5_world", "MP5", "mp5k_zm", 0);
+		AddReward("Common", "t6_wpn_smg_mp5_world", "MP5", "mp5k_zm", 0);
+		AddReward("Rare", "t6_wpn_launch_usrpg_world", "RPG", "usrpg_zm", 0);
+		AddReward("Epic", "t6_wpn_launch_usrpg_world", "RPG", "usrpg_zm", 0);
+	}
+	else{
+		AddReward("Epic", "p6_zm_tm_blood_power_up", "Zombie Blood", "zombie_blood", 1);
+		AddReward("Rare", "p6_zm_tm_blood_power_up", "Zombie Blood", "zombie_blood", 1);
+		AddReward("Common", "t6_wpn_pistol_m1911_world", "Mauser", "c96_zm", 0);
+		AddReward("Common", "t6_wpn_sniper_ballista_world", "Ballista", "ballista_zm", 0);
+		AddReward("Epic", "t6_wpn_ar_stg44_world", "MP40", "mp44_zm", 0);
+		AddReward("Rare", "t6_wpn_ar_stg44_world", "MP40", "mp44_zm", 0);
+		AddReward("Common", "t6_wpn_ar_stg44_world", "MP40", "mp44_zm", 0);
+	}
+	if(level.script != "zm_prison" && level.script != "zm_tomb")
+		AddReward("Legendary", "t6_wpn_ar_m16a2_world", "Skullcrusher", "m16_gl_upgraded_zm", 0);
 	AddReward("Legendary", "Zombie_Skull", "Insta Kill", "insta_kill", 1);
 	AddReward("Legendary", "zombie_ammocan", "Max Ammo", "full_ammo", 1);
 	AddReward("Legendary", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
 	if(getdvarint("TrialsAllowFreePerk") == 1)
 		AddReward("Legendary", "zombie_pickup_perk_bottle", "Free Perk", "free_perk", 1);
 	AddReward("Legendary", "t6_wpn_zmb_raygun_view", "Ray Gun", "ray_gun_zm", 0);
-	AddReward("Legendary", "t6_wpn_lmg_rpd_world", "RPD", "rpd_zm", 0);
 	AddReward("Legendary", "t6_wpn_ar_galil_world", "Galil", "galil_upgraded_zm", 0);
 	AddReward("Legendary", "t6_wpn_lmg_hamr_world", "HAMR", "hamr_upgraded_zm", 0);
-	if(level.script != "zm_prison")
-		AddReward("Legendary", "t6_wpn_ar_m16a2_world", "Skullcrusher", "m16_gl_upgraded_zm", 0);
 	if(getdvarint("TrialsEnableWonderweapons") == 1){
 		AddReward("Legendary", "t6_wpn_zmb_raygun2_world", "Ray Gun Mark 2", "raygun_mark2_zm", 0);
 		if(level.script == "zm_prison")
@@ -140,27 +171,28 @@ init() {
 	AddReward("Epic", "t6_wpn_pistol_b2023r_world", "B23r", "beretta93r_zm", 0);
 	if(level.script != "zm_prison")
 		AddReward("Epic", "t6_wpn_ar_m16a2_world", "M16", "m16_zm", 0);
-	AddReward("Epic", "t6_wpn_smg_mp5_world", "MP5", "mp5k_zm", 0);
 	
 	AddReward("Rare", "zombie_carpenter", "Carpenter", "carpenter", 1);
 	AddReward("Rare", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
 	AddReward("Rare", "zombie_x2_icon", "Double Points", "double_points", 1);
 	AddReward("Rare", "zombie_bomb", "Nuke", "nuke", 1);
-	AddReward("Rare", "t6_wpn_smg_mp5_world", "MP5", "mp5k_zm", 0);
 	AddReward("Rare", "t6_wpn_pistol_kard_world", "KAP-40", "kard_zm", 0);
-	AddReward("Rare", "t6_wpn_launch_usrpg_world", "RPG", "usrpg_zm", 0);
 	AddReward("Rare", "t6_wpn_pistol_m1911_world", "M1911", "m1911_zm", 0);
 	AddReward("Rare", "t6_wpn_shotty_870mcs_world", "Remington", "870mcs_zm", 0);
 	
 	AddReward("Common", "zombie_carpenter", "Carpenter", "carpenter", 1);
 	AddReward("Common", "zombie_z_money_icon", "Bonus Points", "Lose_Points", 1);
 	AddReward("Common", "zombie_bomb", "Nuke", "nuke", 1);
-	AddReward("Common", "t6_wpn_pistol_m1911_world", "M1911", "m1911_zm", 0);
-	AddReward("Common", "t6_wpn_shotty_olympia_world", "Olympia", "rottweil72_zm", 0);
-	if(level.script != "zm_prison")
+	if(level.script != "zm_prison" && level.script != "zm_tomb")
 		AddReward("Common", "t6_wpn_ar_saritch_world", "SMR", "saritch_zm", 0);
 	AddReward("Common", "t6_wpn_ar_m14_world", "M14", "m14_zm", 0);
-	AddReward("Common", "t6_wpn_smg_mp5_world", "MP5", "mp5k_zm", 0);
+	if(level.script == "zm_tomb"){
+		flag_wait("initial_blackscreen_passed");
+		playfx(level._effect[ "fx_tomb_chamber_glow_blue" ], PodiumOrigin[0] - (0,0,10), (0,90,0), (0,90,0));
+		playfx(level._effect[ "fx_tomb_chamber_glow_yellow" ], PodiumOrigin[1] - (0,0,10), (0,0,0), (0,90,0));
+		playfx(level._effect[ "fx_tomb_crafting_chamber_glow" ], PodiumOrigin[2] - (0,0,10));
+		playfx(level._effect[ "fx_tomb_chamber_glow_red" ], PodiumOrigin[3] - (0,0,10));
+	}
 }
 
 AddReward(TrialRank, RewardModel, RewardHintname, RewardCodename, Powerup) {
@@ -286,7 +318,10 @@ Random_Reward(TrialLevel) {
 RewardModelMain() {
     self endon("Done");
     level endon("end_game");
-    playfxontag(level._effect["powerup_on_solo"], self, "tag_origin");
+    if(level.script == "zm_tomb")
+    	playfxontag(level._effect[ "special_glow" ], self, "tag_origin");
+   	else
+    	playfxontag(level._effect["powerup_on_solo"], self, "tag_origin");
 	while(isDefined( self )){
 		waittime = randomfloatrange(2.5, 5);
 		yaw = randomint(360);
@@ -355,7 +390,8 @@ TrialsSystem(CalculatedOrigin,SelectedModel, Origin, Angles, ActivatiorModel, Ac
 	TrialMainModel = spawn( "script_model", ActivatiorOrigim);
 	TrialMainModel.angles = ActivatorAngles;
 	TrialMainModel setmodel(ActivatiorModel);
-	if(level.script != "zm_prison")
+	
+	if(level.script != "zm_prison" && level.script != "zm_tomb")
 		TrialMainModel thread MainModelAnimation();
 	
 	TrialsMainTrigger = spawn("trigger_radius", ActivatiorOrigim, 1, 50, 50);
@@ -986,8 +1022,8 @@ draw_reward_alert(text) {
         self.trials_upgrade.sort = 2;
         self.trials_upgrade.foreground = true;
         self.trials_upgrade.hidewheninmenu = true;
-        self.trials_upgrade settext("REWARD UPGRADED");
     }
+    self.trials_upgrade settext(text);
 
     // Animation
     self playlocalsound("zmb_cha_ching");
@@ -1217,6 +1253,8 @@ ShowToSpecific(FXOrigin,Index){
 					playfx( level._effect[ "character_fire_death_sm" ], FXOrigin);
 				else if(level.script == "zm_prison")
 					playfx(level._effect[ "fx_alcatraz_elec_chair" ],FXOrigin - (17,0,15),anglesToForward(0,0,0), anglesToUp(0,0,0));// Too Lazy
+				else if(level.script == "zm_buried")
+					playfx( level._effect[ "character_fire_death_sm" ], FXOrigin);
 			}
 		}
 		wait 5;
