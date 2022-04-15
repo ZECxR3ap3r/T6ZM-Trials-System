@@ -120,7 +120,8 @@ init() {
 	AddReward("Legendary", "t6_wpn_lmg_rpd_world", "RPD", "rpd_zm", 0);
 	AddReward("Legendary", "t6_wpn_ar_galil_world", "Galil", "galil_upgraded_zm", 0);
 	AddReward("Legendary", "t6_wpn_lmg_hamr_world", "HAMR", "hamr_upgraded_zm", 0);
-	AddReward("Legendary", "t6_wpn_ar_m16a2_world", "Skullcrusher", "m16_gl_upgraded_zm", 0);
+	if(level.script != "zm_prison")
+		AddReward("Legendary", "t6_wpn_ar_m16a2_world", "Skullcrusher", "m16_gl_upgraded_zm", 0);
 	if(getdvarint("TrialsEnableWonderweapons") == 1){
 		AddReward("Legendary", "t6_wpn_zmb_raygun2_world", "Ray Gun Mark 2", "raygun_mark2_zm", 0);
 		if(level.script == "zm_prison")
@@ -137,7 +138,8 @@ init() {
 	AddReward("Epic", "t6_wpn_sniper_dsr50_world", "DSR-50", "dsr50_zm", 0);
 	AddReward("Epic", "t6_wpn_ar_galil_world", "Galil", "galil_zm", 0);
 	AddReward("Epic", "t6_wpn_pistol_b2023r_world", "B23r", "beretta93r_zm", 0);
-	AddReward("Epic", "t6_wpn_ar_m16a2_world", "M16", "m16_zm", 0);
+	if(level.script != "zm_prison")
+		AddReward("Epic", "t6_wpn_ar_m16a2_world", "M16", "m16_zm", 0);
 	AddReward("Epic", "t6_wpn_smg_mp5_world", "MP5", "mp5k_zm", 0);
 	
 	AddReward("Rare", "zombie_carpenter", "Carpenter", "carpenter", 1);
@@ -155,7 +157,8 @@ init() {
 	AddReward("Common", "zombie_bomb", "Nuke", "nuke", 1);
 	AddReward("Common", "t6_wpn_pistol_m1911_world", "M1911", "m1911_zm", 0);
 	AddReward("Common", "t6_wpn_shotty_olympia_world", "Olympia", "rottweil72_zm", 0);
-	AddReward("Common", "t6_wpn_ar_saritch_world", "SMR", "saritch_zm", 0);
+	if(level.script != "zm_prison")
+		AddReward("Common", "t6_wpn_ar_saritch_world", "SMR", "saritch_zm", 0);
 	AddReward("Common", "t6_wpn_ar_m14_world", "M14", "m14_zm", 0);
 	AddReward("Common", "t6_wpn_smg_mp5_world", "MP5", "mp5k_zm", 0);
 }
@@ -1122,7 +1125,7 @@ set_trial_reward(tier) {
         default:
             return;
     }
-
+	 previous = self.trials_reward_code;
     self.trials_reward_color = color[0];
     self.trials_reward_code = tier;
     self.trials_reward_color_code = getsubstr(text, 0, 2);
@@ -1143,7 +1146,7 @@ set_trial_reward(tier) {
     self.trials_legend.alpha = alpha[3];
     
     // Trigger trial challenge text overwrite or reset
-    if (tier == "legendary" )
+    if (tier == "legendary" || previous == "legendary")
         set_trial_challenge(self.trials_challenge_text);
 }
 
