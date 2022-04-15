@@ -32,7 +32,7 @@
 
 ## ⭐ Description
 
-The popular **Trial & Rewards system** is now available for **Black Ops 2 Zombies**!
+The popular **Trials & Rewards system** is now available for **Black Ops 2 Zombies**!
 
 Known from Black Ops Cold War, Black Ops 4 IX ([Challenge Banners](https://www.reddit.com/r/CODZombies/wiki/ix#wiki_challenge_banners)), Ancient Evil ([Tributes to Apollo](https://www.reddit.com/r/CODZombies/wiki/ancient-evil#wiki_tributes)) and some [Black Ops 3 maps](https://callofduty.fandom.com/wiki/Trials), you can now solve challenges and receive in-game rewards. The more and faster you complete challenges, the higher the tier and chance for a better reward.
 
