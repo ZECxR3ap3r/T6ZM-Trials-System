@@ -55,8 +55,8 @@ init() {
     		PodiumOrigin = array((495.129, -289.81, -39.875), (595.129, -289.81, -39.875), (775.129, -289.81, -39.875), (875.129, -289.81, -39.875));
     		PodiumAngles = array((90, 270, 0), (90, 270, 0), (90,270,0), (90,270,0));
     		TrialsMainModel = "zombie_teddybear";
-    		TrialsMainOrigin = (685.358, -277.641, -63.0248);
-    		TrialsMainAngles = (0, 0, 0);
+    		TrialsMainOrigin = (685.358, -277.641, -33.0248);
+    		TrialsMainAngles = (0, -90, 0);
     		FXOriginOffset = (0,10,18);
     	}
    	 	else if ( getDvar( "ui_zm_mapstartlocation" ) == "farm" ){
@@ -67,19 +67,21 @@ init() {
     		PodiumOrigin = array((7070.94, -5798.61, -28.2646), (7070.94, -5744.61, -28.2646), (7070.94, -5692.61, -28.2646), (7070.94, -5638.61, -28.2646));
     		PodiumAngles = array((90, 0, 0), (90, 0, 0), (90,0,0), (90,0,0));
     		TrialsMainModel = "zombie_teddybear";
-    		TrialsMainOrigin = (7683.7, -5559.19, 7.12722);
-    		TrialsMainAngles = (0, 30, 0);
+    		TrialsMainOrigin = (7670.15, -5562.8, 50.5099);
+    		TrialsMainAngles = (0, -50, 0);
+    		FXOriginOffset = (-12,0,20);
     	}
     	else if ( getDvar( "ui_zm_mapstartlocation" ) == "transit" && getDvar( "ui_zm_gamemodegroup" ) == "zsurvival"){
-			Collision = spawn( "script_model", (-6298.53, 5449.84, 84.125));
+			Collision = spawn( "script_model", (-6289.62, 5455.29, 74.125));
 			Collision.angles = (0, 90, 0);
 			Collision setmodel("collision_wall_256x256x10_standard");
     		PodiumModel = "t6_wpn_zmb_jet_gun_world";
-    		PodiumOrigin = array((-6314.29, 5525.95, -35.875), (-6314.29, 5465.95, -35.875), (-6314.29, 5405.95, -35.875), (-6314.29, 5345.95, -35.875));
+    		PodiumOrigin = array((-6284.36, 5347.11, -35.875), (-6284.36, 5407.11, -35.875), (-6284.36, 5467.11, -35.875), (-6284.36, 5527.11, -35.875));
     		PodiumAngles = array((90, 0, 0), (90, 0, 0), (90,0,0), (90,0,0));
     		TrialsMainModel = "zombie_teddybear";
-    		TrialsMainOrigin = (-6076.73, 5601.59, -31.875);
-    		TrialsMainAngles = (0, -40, 0);
+    		TrialsMainOrigin = (-6097.18, 5610.29, -3.875);
+    		TrialsMainAngles = (0, -130, 0);
+    		FXOriginOffset = (-12,0,20);
     	}
     }
     else if(level.script == "zm_prison"){
@@ -356,7 +358,7 @@ TrialsSystem(CalculatedOrigin,SelectedModel, Origin, Angles, ActivatiorModel, Ac
 	Challenges[8] = "CR_Trial";//Close Range Kills
 	Challenges[9] = "BR_Trial";//Big Range Kills
 	Challenges[10] = "TD_Trial";//Take Damage*/
-	if(getDvar( "ui_zm_mapstartlocation" ) != "farm" || getDvar( "ui_zm_mapstartlocation" ) != "station"){
+	if(getDvar( "ui_zm_mapstartlocation" ) != "farm" && getDvar( "ui_zm_mapstartlocation" ) != "station"){
 		Challenges[11] = "KISZ_Trial";//Kill In Random Zone
 		Challenges[12] = "SISZ_Trial";//Stay In Random Zone
 		Challenges[13] = "NPAP_Trial";//Kill With no Pap Weapon
