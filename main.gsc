@@ -30,6 +30,8 @@ init() {
 	precachemodel("t6_wpn_zmb_raygun_view");
 	precachemodel("p6_anim_zm_buildable_pap");
 	precachemodel("collision_wall_256x256x10_standard");
+	precachemodel("p6_zm_hr_lion_statue_base");
+	precachemodel("p6_zm_hr_lion_statue");
 	precacheshader("gradient");
 	precacheshader("white");
 	precacheshader("menu_mp_star_rating");
@@ -120,6 +122,42 @@ init() {
     	TrialsMainAngles = (0, 0, 0);
     	FXOriginOffset = (0,0,30);
     }
+    else if(level.script == "zm_nuked"){
+    	Collision = spawn( "script_model", (578.573, 742.585, -64.1112));
+		Collision.angles = (0, -164, 0);
+		Collision setmodel("collision_wall_256x256x10_standard");
+    	PodiumModel = "dest_zm_nuked_male_01_d0";
+    	PodiumOrigin = array((665.924, 740.986, -56.875), (617.924, 726.986, -56.875), (565.924, 712.986, -56.875), (515.924, 698.986, -56.875));
+    	PodiumAngles = array((0, -250, 0), (0, -250, 0), (0,-250,0), (0,-250,0));
+    	TrialsMainModel = "zombie_teddybear";
+    	TrialsMainOrigin = (661.327, 983.586, -52.875);
+    	TrialsMainAngles = (0, -150, 0);
+    	FXOriginOffset = (-4,15,14);
+    }
+    else if(level.script == "zm_highrise"){
+    	Collision = spawn( "script_model", (1430.19, -348.386, 2624.13));
+		Collision.angles = (0, 60, 0);
+		Collision setmodel("collision_wall_512x512x10_standard");
+		Lion1 = spawn( "script_model", (1347.93, -459.859, 2742.13));
+		Lion1.angles = (0, 60, 0);
+		Lion1 setmodel("p6_zm_hr_lion_statue");
+		Lion2 = spawn( "script_model", (1400.9, -368.924, 2742.13));
+		Lion2.angles = (0, 60, 0);
+		Lion2 setmodel("p6_zm_hr_lion_statue");
+		Lion3 = spawn( "script_model", (1483.22, -226.259, 2742.13));
+		Lion3.angles = (0, 60, 0);
+		Lion3 setmodel("p6_zm_hr_lion_statue");
+		Lion4 = spawn( "script_model", (1534.45, -137.528, 2742.13));
+		Lion4.angles = (0, 60, 0);
+		Lion4 setmodel("p6_zm_hr_lion_statue");
+    	PodiumModel = "p6_zm_hr_lion_statue_base";
+    	PodiumOrigin = array((1347.93, -459.859, 2704.13), (1400.9, -368.924, 2704.13), (1483.22, -226.259, 2704.13), (1534.45, -137.528, 2704.13));
+    	PodiumAngles = array((0, 60, 0), (0, 60, 0), (0,60,0), (0,60,0));
+    	TrialsMainModel = "zombie_teddybear";
+    	TrialsMainOrigin = (1434.69, -296.901, 2749.13);
+    	TrialsMainAngles = (0, -35, 0);
+    	FXOriginOffset = (0,2,55);
+    }
 	level.ReaperTrialsActive = 0;
 	level thread TrialsSystem(FXOriginOffset,PodiumModel, PodiumOrigin, PodiumAngles, TrialsMainModel, TrialsMainOrigin, TrialsMainAngles);
 	level thread onPlayerConnect();
@@ -149,7 +187,8 @@ init() {
 		AddReward("Legendary", "t6_wpn_ar_m16a2_world", "Skullcrusher", "m16_gl_upgraded_zm", 0);
 	AddReward("Legendary", "Zombie_Skull", "Insta Kill", "insta_kill", 1);
 	AddReward("Legendary", "zombie_ammocan", "Max Ammo", "full_ammo", 1);
-	AddReward("Legendary", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
+	if(level.script != "zm_highrise")
+		AddReward("Legendary", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
 	if(getdvarint("TrialsAllowFreePerk") == 1)
 		AddReward("Legendary", "zombie_pickup_perk_bottle", "Free Perk", "free_perk", 1);
 	AddReward("Legendary", "t6_wpn_zmb_raygun_view", "Ray Gun", "ray_gun_zm", 0);
@@ -167,15 +206,17 @@ init() {
 		
 	AddReward("Epic", "Zombie_Skull", "Insta Kill", "insta_kill", 1);
 	AddReward("Epic", "zombie_x2_icon", "Double Points", "double_points", 1);
-	AddReward("Epic", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
+	if(level.script != "zm_highrise")
+		AddReward("Epic", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
 	AddReward("Epic", "t6_wpn_sniper_dsr50_world", "DSR-50", "dsr50_zm", 0);
 	AddReward("Epic", "t6_wpn_ar_galil_world", "Galil", "galil_zm", 0);
 	AddReward("Epic", "t6_wpn_pistol_b2023r_world", "B23r", "beretta93r_zm", 0);
 	if(level.script != "zm_prison")
 		AddReward("Epic", "t6_wpn_ar_m16a2_world", "M16", "m16_zm", 0);
-	
-	AddReward("Rare", "zombie_carpenter", "Carpenter", "carpenter", 1);
-	AddReward("Rare", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
+	if(level.script != "zm_nuked"){
+		AddReward("Rare", "zombie_carpenter", "Carpenter", "carpenter", 1);
+	if(level.script != "zm_highrise")
+		AddReward("Rare", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
 	AddReward("Rare", "zombie_x2_icon", "Double Points", "double_points", 1);
 	AddReward("Rare", "zombie_bomb", "Nuke", "nuke", 1);
 	AddReward("Rare", "t6_wpn_pistol_kard_world", "KAP-40", "kard_zm", 0);
@@ -183,7 +224,8 @@ init() {
 	AddReward("Rare", "t6_wpn_shotty_870mcs_world", "Remington", "870mcs_zm", 0);
 	
 	AddReward("Common", "zombie_carpenter", "Carpenter", "carpenter", 1);
-	AddReward("Common", "zombie_z_money_icon", "Bonus Points", "Lose_Points", 1);
+	if(level.script != "zm_highrise")
+		AddReward("Common", "zombie_z_money_icon", "Bonus Points", "Lose_Points", 1);
 	AddReward("Common", "zombie_bomb", "Nuke", "nuke", 1);
 	if(level.script != "zm_prison" && level.script != "zm_tomb")
 		AddReward("Common", "t6_wpn_ar_saritch_world", "SMR", "saritch_zm", 0);
@@ -395,7 +437,7 @@ TrialsSystem(CalculatedOrigin,SelectedModel, Origin, Angles, ActivatiorModel, Ac
 	
 	if(level.script != "zm_prison" && level.script != "zm_tomb")
 		TrialMainModel thread MainModelAnimation();
-	
+		
 	TrialsMainTrigger = spawn("trigger_radius", ActivatiorOrigim, 1, 50, 50);
 	TrialsMainTrigger SetCursorHint( "HINT_NOICON" );
 	
@@ -686,7 +728,10 @@ PlayerTrialHandlerTime(trial, Points, SpecificZone){
 
 PodiumSetupTrigger(CalculatedOrigin,Index){
 	level endon("end_game");
-	trigger = Spawn( "trigger_radius", self.origin + (0, 0, 30), 0, 30, 30 );
+	if(level.script == "zm_nuked")
+		trigger = Spawn( "trigger_radius", self.origin + (0, 0, 30), 0, 45, 45 );
+	else
+		trigger = Spawn( "trigger_radius", self.origin + (0, 0, 30), 0, 30, 30 );
 	trigger SetCursorHint( "HINT_NOICON" );
 	trigger thread ShowToSpecific(CalculatedOrigin,Index);
 	while(1){
