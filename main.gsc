@@ -453,7 +453,9 @@ TrialsSystem(CalculatedOrigin,SelectedModel, Origin, Angles, ActivatiorModel, Ac
 	while(1){
 		if(level.ReaperTrialsActive == 0) {
 			if(getdvarint(TrialsHigherThePrice) == 1) {
-				if(level.round_number >= 10 && level.round_number < 20)
+				if(level.round_number >= 1 && level.round_number < 10)
+					TrialsCost = DefaultCost;
+				else if(level.round_number >= 10 && level.round_number < 20)
 					TrialsCost = DefaultCost * 2;
 				else if(level.round_number >= 20 && level.round_number < 30)
 					TrialsCost = DefaultCost * 3;
@@ -462,6 +464,7 @@ TrialsSystem(CalculatedOrigin,SelectedModel, Origin, Angles, ActivatiorModel, Ac
 			}
 			else
 				TrialsCost = DefaultCost;
+			
 			TrialsMainTrigger SetHintString("Hold ^3&&1^7 to Activate Trial [Cost: " + TrialsCost + "]");
 		}
 		else
