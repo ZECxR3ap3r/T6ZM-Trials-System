@@ -38,14 +38,10 @@ init() {
 	precacheshader("scorebar_zom_1");
 	precacheshader("codtv_info");
 	// Settings
-	setDvar("TrialsHigherThePrice", 1);// Cost of the Trials will be add every 10 rounds + Default TrialsCost
 	setDvar("TrialsCost", 500);// How Much the trials will cost
 	setDvar("TrialsAllowFreePerk", 1);// Adds a Free Perk Powerup to the Trials Rewards
 	setDvar("TrialsEnableWonderweapons", 1);// Adds Legendary Wonderweapon Rewards
 	setDvar("TrialsEnablePapDrop", 1);// Adds Legendary Pap Powerup Reward
-	
-	setDvar( "scr_screecher_ignore_player", 1 );
-	setDvar( "sv_cheats", 1 );
 	// Setup
 	if(level.script == "zm_transit") {
 		if(getDvar( "ui_zm_mapstartlocation" ) == "transit" && getDvar( "ui_zm_gamemodegroup" ) != "zsurvival"|| getDvar( "ui_zm_mapstartlocation" ) == "town"){
@@ -383,23 +379,25 @@ TrialsSystem(CalculatedOrigin,SelectedModel, Origin, Angles, ActivatiorModel, Ac
 	level endon("end_game");
 	
 	Challenges = [];
-	Challenges[Challenges.size] = "K_Trial";//Regular Kills
-	Challenges[Challenges.size] = "HK_Trial";//Headshot Kills
-	Challenges[Challenges.size] = "MK_Trial";//Melee Kills
-	Challenges[Challenges.size] = "GO_Trial";//Kill Zombies With Grenades
-	Challenges[Challenges.size] = "C_Trial";//Kill Zombies While Crouched
-	Challenges[Challenges.size] = "NH_Trial";//No Hits
-	Challenges[Challenges.size] = "BRS_Trial";//Buy Stuff
-	Challenges[Challenges.size] = "NAIM_Trial";//No Aim
-	Challenges[Challenges.size] = "CR_Trial";//Close Range Kills
-	Challenges[Challenges.size] = "BR_Trial";//Big Range Kills
-	Challenges[Challenges.size] = "TD_Trial";//Take Damage
-	Challenges[Challenges.size] = "PK_Trial";//Prone Kills
-	if(getDvar( "ui_zm_mapstartlocation" ) != "farm" && getDvar( "ui_zm_mapstartlocation" ) != "station"){
-		Challenges[Challenges.size] = "KISZ_Trial";//Kill In Random Zone
-		Challenges[Challenges.size] = "SISZ_Trial";//Stay In Random Zone
-		Challenges[Challenges.size] = "NPAP_Trial";//Kill With no Pap Weapon
-		Challenges[Challenges.size] = "PAP_Trial";//Kill With Pap Weapon
+	Challenges[Challenges.size] = "K_Trial";// Regular Kills
+	Challenges[Challenges.size] = "HK_Trial";// Headshot Kills
+	Challenges[Challenges.size] = "MK_Trial";// Melee Kills
+	Challenges[Challenges.size] = "GO_Trial";// Kill Zombies With Grenades
+	Challenges[Challenges.size] = "C_Trial";// Kill Zombies While Crouched
+	Challenges[Challenges.size] = "NH_Trial";// No Hits
+	Challenges[Challenges.size] = "BRS_Trial";// Buy Stuff
+	Challenges[Challenges.size] = "NAIM_Trial";// No Aim
+	Challenges[Challenges.size] = "CR_Trial";// Close Range Kills
+	Challenges[Challenges.size] = "BR_Trial";// Big Range Kills
+	Challenges[Challenges.size] = "TD_Trial";// Take Damage
+	Challenges[Challenges.size] = "PK_Trial";// Prone Kills
+	if(level.script == "zm_transit" && getDvar( "ui_gametype" ) == "zsurvival" ) {
+		if(getDvar( "ui_zm_mapstartlocation" ) == "town") {
+			Challenges[Challenges.size] = "KISZ_Trial";// Kill In Random Zone
+			Challenges[Challenges.size] = "SISZ_Trial";// Stay In Random Zone
+			Challenges[Challenges.size] = "NPAP_Trial";// Kill With no Pap Weapon
+			Challenges[Challenges.size] = "PAP_Trial";// Kill With Pap Weapon
+		}
 	}
 	
 	TrialPodium_Player1 = spawn( "script_model", Origin[0]);
@@ -447,26 +445,12 @@ TrialsSystem(CalculatedOrigin,SelectedModel, Origin, Angles, ActivatiorModel, Ac
 			}
 		}
 	}
-	DefaultCost = getDvarInt("TrialsCost");
+	TrialsCost = getDvarInt("TrialsCost");
 	Challenges = array_randomize(Challenges);
 	Num = 0;
 	while(1){
-		if(level.ReaperTrialsActive == 0) {
-			if(getdvarint(TrialsHigherThePrice) == 1) {
-				if(level.round_number >= 1 && level.round_number < 10)
-					TrialsCost = DefaultCost;
-				else if(level.round_number >= 10 && level.round_number < 20)
-					TrialsCost = DefaultCost * 2;
-				else if(level.round_number >= 20 && level.round_number < 30)
-					TrialsCost = DefaultCost * 3;
-				else if(level.round_number >= 30 && level.round_number < 40)
-					TrialsCost = DefaultCost * 4;
-			}
-			else
-				TrialsCost = DefaultCost;
-			
+		if(level.ReaperTrialsActive == 0)
 			TrialsMainTrigger SetHintString("Hold ^3&&1^7 to Activate Trial [Cost: " + TrialsCost + "]");
-		}
 		else
 			TrialsMainTrigger SetHintString("Trial is already Running!");
 		TrialsMainTrigger waittill("trigger", player);
@@ -1303,6 +1287,7 @@ ShowToSpecific(FXOrigin,Index){
 }
 
 get_zone_name(key) {
+
     // Caching and array lookup is way more efficient
     if (isdefined(level.zone_names))
         return level.zone_names[key];
@@ -1352,9 +1337,10 @@ get_zone_name(key) {
             level.zone_names["zone_tow"] = "Center Town";
             level.zone_names["zone_town_east"] = "East Town";
             level.zone_names["zone_town_west"] = "West Town";
+            level.zone_names["zone_town_west2"] = "West Town 2";
             level.zone_names["zone_town_south"] = "South Town";
             level.zone_names["zone_bar"] = "Bar";
-            level.zone_names["zone_town_barber"] = "Bookstore";
+            level.zone_names["zone_town_barber"] = "Above Barbershop";
             level.zone_names["zone_ban"] = "Bank";
             level.zone_names["zone_ban_vault"] = "Bank Vault";
             level.zone_names["zone_tbu"] = "Laboratory";
@@ -1490,6 +1476,7 @@ get_zone_name(key) {
             level.zone_names["zone_start_b"] = "Generator 1";
             level.zone_names["zone_bunker_1a"] = "Generator 3 Bunker 1";
             level.zone_names["zone_fire_stairs"] = "Fire Tunnel";
+            level.zone_names["zone_fire_stairs_1"] = "zone_fire_stairs_1";
             level.zone_names["zone_bunker_1"] = "Generator 3 Bunker 2";
             level.zone_names["zone_bunker_3a"] = "Generator 3";
             level.zone_names["zone_bunker_3b"] = "Generator 3 Bunker 3";
@@ -1518,8 +1505,10 @@ get_zone_name(key) {
             level.zone_names["zone_nml_0"] = "Generator 5 Left Footstep";
             level.zone_names["zone_nml_5"] = "Generator 5 Right Footstep Walkway";
             level.zone_names["zone_nml_farm"] = "Generator 5";
+            level.zone_names["zone_nml_farm_1"] = "zone_nml_farm_1";
             level.zone_names["zone_nml_celllar"] = "Generator 5 Cellar";
             level.zone_names["zone_bolt_stairs"] = "Lightning Tunnel";
+            level.zone_names["zone_bolt_stairs_1"] = "zone_bolt_stairs_1";
             level.zone_names["zone_nml_3"] = "No Man's Land 1st Right Footstep";
             level.zone_names["zone_nml_2b"] = "No Man's Land Stairs";
             level.zone_names["zone_nml_6"] = "No Man's Land Left Footstep";
@@ -1527,37 +1516,49 @@ get_zone_name(key) {
             level.zone_names["zone_nml_10a"] = "Generator 4 Tank Route 1";
             level.zone_names["zone_nml_10"] = "Generator 4 Tank Route 2";
             level.zone_names["zone_nml_7"] = "Generator 4 Tank Route 3";
+            level.zone_names["zone_nml_7a"] = "zone_nml_7a";
             level.zone_names["zone_bunker_tank_a"] = "Generator 4 Tank Route 4";
             level.zone_names["zone_bunker_tank_a1"] = "Generator 4 Tank Route 5";
             level.zone_names["zone_bunker_tank_a2"] = "zone_bunker_tank_a2";
             level.zone_names["zone_bunker_tank_b"] = "Generator 4 Tank Route 6";
             level.zone_names["zone_nml_9"] = "Generator 4 Left Footstep";
+            level.zone_names["zone_nml_9a"] = "zone_nml_9a";
             level.zone_names["zone_air_stairs"] = "Wind Tunnel";
+            level.zone_names["zone_air_stairs_1"] = "zone_air_stairs_1";
             level.zone_names["zone_nml_11"] = "Generator 4";
+            level.zone_names["zone_nml_11a"] = "zone_nml_11a";
             level.zone_names["zone_nml_12"] = "Generator 4 Right Footstep";
+            level.zone_names["zone_nml_12a"] = "zone_nml_12a";
             level.zone_names["zone_nml_16"] = "Excavation Site Front Path";
+            level.zone_names["zone_nml_16a"] = "zone_nml_16a";
             level.zone_names["zone_nml_17"] = "Excavation Site Back Path";
+            level.zone_names["zone_nml_17a"] = "zone_nml_17a";
             level.zone_names["zone_nml_18"] = "Excavation Site Level 3";
             level.zone_names["zone_nml_19"] = "Excavation Site Level 2";
             level.zone_names["ug_bottom_zone"] = "Excavation Site Level 1";
             level.zone_names["zone_nml_13"] = "Generator 5 To Generator 6 Path";
             level.zone_names["zone_nml_14"] = "Generator 4 To Generator 6 Path";
             level.zone_names["zone_nml_15"] = "Generator 6 Entrance";
+            level.zone_names["zone_nml_15a"] = "zone_nml_15a";
             level.zone_names["zone_village_0"] = "Generator 6 Left Footstep";
             level.zone_names["zone_village_5"] = "Generator 6 Tank Route 1";
             level.zone_names["zone_village_5a"] = "Generator 6 Tank Route 2";
             level.zone_names["zone_village_5b"] = "Generator 6 Tank Route 3";
             level.zone_names["zone_village_1"] = "Generator 6 Tank Route 4";
+            level.zone_names["zone_village_1a"] = "zone_village_1a";
             level.zone_names["zone_village_4b"] = "Generator 6 Tank Route 5";
             level.zone_names["zone_village_4a"] = "Generator 6 Tank Route 6";
             level.zone_names["zone_village_4"] = "Generator 6 Tank Route 7";
             level.zone_names["zone_village_2"] = "Church";
             level.zone_names["zone_village_3"] = "Generator 6 Right Footstep";
             level.zone_names["zone_village_3a"] = "Generator 6";
+            level.zone_names["zone_village_3b"] = "zone_village_3b";
             level.zone_names["zone_ice_stairs"] = "Ice Tunnel";
+            level.zone_names["zone_ice_stairs_1"] = "zone_ice_stairs_1";
             level.zone_names["zone_bunker_6"] = "Above Generator 3 Bunker";
             level.zone_names["zone_nml_20"] = "Above No Man's Land";
             level.zone_names["zone_village_6"] = "Behind Church";
+            level.zone_names["zone_village_6a"] = "zone_village_6a";
             level.zone_names["zone_chamber_0"] = "The Crazy Place Lightning Chamber";
             level.zone_names["zone_chamber_1"] = "The Crazy Place Lightning & Ice";
             level.zone_names["zone_chamber_2"] = "The Crazy Place Ice Chamber";
