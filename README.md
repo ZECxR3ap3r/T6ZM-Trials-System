@@ -46,13 +46,17 @@ Known from Black Ops Cold War, Black Ops 4 IX ([Challenge Banners](https://www.r
 
 #### Note
 
-This mod is technically **in beta** and might still have some bugs. We therefore ask and hope that you **report any problems** either on the [Plutonium Forum](https://forum.plutonium.pw/), on [Discord](https://discord.gg) or as a [GitHub issue](https://github.com/ZECxR3ap3r/Bo2TrialsGSC/issues).
+This mod is technically **in beta** and might still have some bugs. We therefore ask and hope that you **report any problems** either on the [Plutonium Forum](https://forum.plutonium.pw/), on [Discord](https://discord.gg/Z5UsgDwSUf) or as a [GitHub issue](https://github.com/ZECxR3ap3r/Bo2TrialsGSC/issues).
 
 <br>
 
 ## 🤯 Guide
 
 ## 🧩 Installation
+-Step 1 Compile the file main.gsc with a GSC Compiler
+-Step 2 Move the Compiled file in your Directory %localappdata%\Plutonium\storage\t6\scripts\zm\
+  Create any folders if they dont Exist
+-Step 3 Start the Game or Server and have Fun!
 
 ## 🗺️ Supported Maps
 
