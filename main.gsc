@@ -155,11 +155,11 @@ init() {
     }
 	level.ReaperTrialsActive = 0;
 	level thread TrialsSystem(FXOriginOffset,PodiumModel, PodiumOrigin, PodiumAngles, TrialsMainModel, TrialsMainOrigin, TrialsMainAngles);
-	level thread On_Connect();
+	level thread on_connect();
 	level thread EndGameListener();
 	
-	// Rewards (i know its a Mess)
-	switch( level.script ) {
+	// Rewards
+	switch(level.script) {
 		case "zm_transit":
 			AddReward("Legendary", undefined, "Skullcrusher", "m16_gl_upgraded_zm", 0);
 			AddReward("Legendary", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
@@ -277,34 +277,32 @@ init() {
 			AddReward("Common", undefined, "Mauser C96", "c96_zm", 0);
 			AddReward("Common", undefined, "Ballista", "ballista_zm", 0);
 			break;
-		
-		default:
-			if(getdvarint("TrialsEnableWonderweapons") == 1) {
-				AddReward("Legendary", undefined, "Ray Gun Mark 2", "raygun_mark2_zm", 0);
-			if(getdvarint("TrialsAllowFreePerk") == 1)
-				AddReward("Legendary", "zombie_pickup_perk_bottle", "Free Perk", "free_perk", 1);
-			if(getdvarint("TrialsEnablePapDrop") == 1)
-				AddReward("Legendary", "p6_anim_zm_buildable_pap", "Weapon Upgrade", "WeaponUpgrade", 1);
-			AddReward("Legendary", "t6_wpn_zmb_raygun_view", "Ray Gun", "ray_gun_zm", 0);
-			AddReward("Legendary", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
-			AddReward("Legendary", "Zombie_Skull", "Insta Kill", "insta_kill", 1);
-			AddReward("Legendary", "zombie_ammocan", "Max Ammo", "full_ammo", 1);
-			AddReward("Legendary", undefined, "Lamentation", "galil_upgraded_zm", 0);
-			AddReward("Legendary", undefined, "Mnesia", "m14_upgraded_zm", 0);
-			AddReward("Epic", "Zombie_Skull", "Insta Kill", "insta_kill", 1);
-			AddReward("Epic", "zombie_x2_icon", "Double Points", "double_points", 1);
-			AddReward("Epic", undefined, "DSR-50", "dsr50_zm", 0);
-			AddReward("Epic", undefined, "Galil", "galil_zm", 0);
-			AddReward("Epic", undefined, "B23r", "beretta93r_zm", 0);
-			AddReward("Epic", undefined, "Mnesia", "m14_upgraded_zm", 0);
-			AddReward("Rare", "zombie_x2_icon", "Double Points", "double_points", 1);
-			AddReward("Rare", "zombie_bomb", "Nuke", "nuke", 1);
-			AddReward("Rare", undefined, "Remington", "870mcs_zm", 0);
-			AddReward("Common", "zombie_bomb", "Nuke", "nuke", 1);
-			AddReward("Common", undefined, "M14", "m14_zm", 0);
-			break;
 		}
 	}
+	// Everything that works on all Maps
+	if(getdvarint("TrialsEnableWonderweapons") == 1) {
+		AddReward("Legendary", undefined, "Ray Gun Mark 2", "raygun_mark2_zm", 0);
+	if(getdvarint("TrialsAllowFreePerk") == 1)
+		AddReward("Legendary", "zombie_pickup_perk_bottle", "Free Perk", "free_perk", 1);
+	if(getdvarint("TrialsEnablePapDrop") == 1)
+		AddReward("Legendary", "p6_anim_zm_buildable_pap", "Weapon Upgrade", "WeaponUpgrade", 1);
+	AddReward("Legendary", "t6_wpn_zmb_raygun_view", "Ray Gun", "ray_gun_zm", 0);
+	AddReward("Legendary", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
+	AddReward("Legendary", "Zombie_Skull", "Insta Kill", "insta_kill", 1);
+	AddReward("Legendary", "zombie_ammocan", "Max Ammo", "full_ammo", 1);
+	AddReward("Legendary", undefined, "Lamentation", "galil_upgraded_zm", 0);
+	AddReward("Legendary", undefined, "Mnesia", "m14_upgraded_zm", 0);
+	AddReward("Epic", "Zombie_Skull", "Insta Kill", "insta_kill", 1);
+	AddReward("Epic", "zombie_x2_icon", "Double Points", "double_points", 1);
+	AddReward("Epic", undefined, "DSR-50", "dsr50_zm", 0);
+	AddReward("Epic", undefined, "Galil", "galil_zm", 0);
+	AddReward("Epic", undefined, "B23r", "beretta93r_zm", 0);
+	AddReward("Epic", undefined, "Mnesia", "m14_upgraded_zm", 0);
+	AddReward("Rare", "zombie_x2_icon", "Double Points", "double_points", 1);
+	AddReward("Rare", "zombie_bomb", "Nuke", "nuke", 1);
+	AddReward("Rare", undefined, "Remington", "870mcs_zm", 0);
+	AddReward("Common", "zombie_bomb", "Nuke", "nuke", 1);
+	AddReward("Common", undefined, "M14", "m14_zm", 0);
 	if(level.script == "zm_tomb") {
 		flag_wait("initial_blackscreen_passed");
 		playfx(level._effect[ "fx_tomb_chamber_glow_blue" ], PodiumOrigin[0] - (0,0,10), (0,90,0), (0,90,0));
@@ -321,7 +319,10 @@ init_trial_hud() {
     self.trials_space = int(self.trials_height * .115);
     self.trials_star = int(self.trials_space * 2.35);
     self.trials_x = 5;
-    self.trials_y = -120 - self.trials_height;
+    if(level.script == "zm_tomb")
+    	self.trials_y = -180 - self.trials_height;
+    else
+ 	    self.trials_y = -120 - self.trials_height;
     self.trials_reward_color = (.8, 0, 0);
     self.trials_reward_code = "none";
     self.trials_reward_color_code = "^1";
@@ -330,15 +331,15 @@ init_trial_hud() {
     self.trials_init = true;
 }
 
-On_Connect() {
+on_connect() {
 	level endon("end_game");
 	for ( ;; ) {
 		level waittill( "connected", player );
-		player thread On_Spawned();
+		player thread on_spawned();
     }
 }
 
-On_Spawned() {
+on_spawned() {
 	level endon("end_game");
 	self endon( "disconnect" );
 	for ( ;; ) {
@@ -596,7 +597,7 @@ ChallengeHandler(Zones,Challenge){
 		}
 		ChallengeDescription = "Kill Zombies at Location\n^8"+ZoneName;
 		PositiveChallengeDescription = "Kill Zombies at Location\n^2"+ZoneName;
-		Time = 10;
+		Time = 120;
 	}
 	else if(Challenge == "SISZ_Trial"){
 		Num = randomintrange(0, Zones.size);
@@ -609,7 +610,7 @@ ChallengeHandler(Zones,Challenge){
 		}
 		ChallengeDescription = "Stay at Location\n^8"+ZoneName;
 		PositiveChallengeDescription = "Stay at Location\n^2"+ZoneName;
-		Time = 10;
+		Time = 120;
 	}
 	else if(Challenge == "GO_Trial")
 		ChallengeDescription = "Kill Zombies with Grenades";
