@@ -53,10 +53,10 @@ This mod is technically **in beta** and might still have some bugs. We therefore
 ## 🤯 Guide
 
 ## 🧩 Installation
--Step 1 Compile the file main.gsc with a GSC Compiler
--Step 2 Move the Compiled file in your Directory %localappdata%\Plutonium\storage\t6\scripts\zm\
-  Create any folders if they dont Exist
--Step 3 Start the Game or Server and have Fun!
+- Step 1 Compile the file main.gsc with a GSC Compiler
+- Step 2 Move the Compiled file in your Directory %localappdata%\Plutonium\storage\t6\scripts\zm\
+  **Create any folders if they dont Exist**
+- Step 3 Start the Game or Server and have Fun!
 
 ## 🗺️ Supported Maps
 
