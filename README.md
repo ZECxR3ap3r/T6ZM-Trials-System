@@ -48,6 +48,14 @@ Known from Black Ops Cold War, Black Ops 4 IX ([Challenge Banners](https://www.r
 
 This mod is technically **in beta** and might still have some bugs. We therefore ask and hope that you **report any problems** either on the [Plutonium Forum](https://forum.plutonium.pw/), on [Discord](https://discord.gg/Z5UsgDwSUf) or as a [GitHub issue](https://github.com/ZECxR3ap3r/T6ZM-Trials-System/issues).
 
+<details>
+  <summary>Known issues</summary>
+
+  - Problems may occur along with other mods or GSC scripts
+  - The 3rd weapon slot (Mule Kick) is currently ignored when giving rewards
+
+  </details>
+
 <br>
 
 ## 🧩 Installation
