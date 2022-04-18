@@ -20,7 +20,7 @@
 #include maps/mp/zombies/_zm_power;
 #include maps/mp/zombies/_zm_powerups;
 
-// Trials System by ZECxR3ap3r & John Kramer
+// Trials System by ZECxR3ap3r
 
 init() {
 	// Precaching
