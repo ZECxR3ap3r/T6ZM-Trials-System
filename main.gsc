@@ -20,7 +20,7 @@
 #include maps/mp/zombies/_zm_power;
 #include maps/mp/zombies/_zm_powerups;
 
-// Trials System by ZECxR3ap3r
+// Trials System by ZECxR3ap3r & John Kramer
 
 init() {
 	// Precaching
@@ -156,78 +156,168 @@ init() {
 	level.ReaperTrialsActive = 0;
 	level thread TrialsSystem(FXOriginOffset,PodiumModel, PodiumOrigin, PodiumAngles, TrialsMainModel, TrialsMainOrigin, TrialsMainAngles);
 	level thread onPlayerConnect();
+	level thread EndGameListener();
 	
 	// Rewards (i know its a Mess)
-	if(level.script != "zm_prison" && level.script != "zm_tomb")
-		AddReward("Legendary", undefined, "Skullcrusher", "m16_gl_upgraded_zm", 0);
-	AddReward("Legendary", "Zombie_Skull", "Insta Kill", "insta_kill", 1);
-	AddReward("Legendary", "zombie_ammocan", "Max Ammo", "full_ammo", 1);
-	if(level.script != "zm_highrise")
-		AddReward("Legendary", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
-	if(getdvarint("TrialsAllowFreePerk") == 1)
-		AddReward("Legendary", "zombie_pickup_perk_bottle", "Free Perk", "free_perk", 1);
-	AddReward("Legendary", "t6_wpn_zmb_raygun_view", "Ray Gun", "ray_gun_zm", 0);
-	AddReward("Legendary", undefined, "Galil", "galil_upgraded_zm", 0);
-	AddReward("Legendary", undefined, "HAMR", "hamr_upgraded_zm", 0);
-	if(getdvarint("TrialsEnableWonderweapons") == 1) {
-		AddReward("Legendary", undefined, "Ray Gun Mark 2", "raygun_mark2_zm", 0);
-		if(level.script == "zm_prison")
-			AddReward("Legendary", undefined, "Blundergat", "blundergat_zm", 0);
-		if(level.script == "zm_buried")
-			AddReward("Legendary", undefined, "Paralyzer", "slowgun_zm", 0);
+	switch( level.script ) {
+		case "zm_transit":
+			AddReward("Legendary", undefined, "Skullcrusher", "m16_gl_upgraded_zm", 0);
+			AddReward("Legendary", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
+			AddReward("Legendary", undefined, "SLDG HAMR", "hamr_upgraded_zm", 0);
+			AddReward("Epic", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
+			AddReward("Epic", undefined, "M16", "m16_zm", 0);
+			AddReward("Rare", "zombie_carpenter", "Carpenter", "carpenter", 1);
+			AddReward("Rare", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
+			AddReward("Rare", undefined, "KAP-40", "kard_zm", 0);
+			AddReward("Rare", undefined, "M1911", "m1911_zm", 0);
+			AddReward("Rare", undefined, "RPG", "usrpg_zm", 0);
+			AddReward("Common", "zombie_z_money_icon", "Bonus Points", "Lose_Points", 1);
+			AddReward("Common", "zombie_carpenter", "Carpenter", "carpenter", 1);
+			AddReward("Common", undefined, "SMR", "saritch_zm", 0);
+			AddReward("Common", undefined, "RPG", "usrpg_zm", 0);
+			AddReward("Epic", undefined, "MP5", "mp5k_zm", 0);
+			AddReward("Rare", undefined, "MP5", "mp5k_zm", 0);
+			AddReward("Common", undefined, "MP5", "mp5k_zm", 0);
+			AddReward("Common", undefined, "M1911", "m1911_zm", 0);
+			AddReward("Common", undefined, "Olympia", "rottweil72_zm", 0);
+			AddReward("Legendary", undefined, "RPD", "rpd_zm", 0);
+		case "zm_nuked":
+			AddReward("Legendary", undefined, "Skullcrusher", "m16_gl_upgraded_zm", 0);
+			AddReward("Legendary", undefined, "SLDG HAMR", "hamr_upgraded_zm", 0);
+			AddReward("Epic", undefined, "M16", "m16_zm", 0);
+			AddReward("Rare", undefined, "KAP-40", "kard_zm", 0);
+			AddReward("Rare", undefined, "M1911", "m1911_zm", 0);
+			AddReward("Rare", undefined, "RPG", "usrpg_zm", 0);
+			AddReward("Common", undefined, "SMR", "saritch_zm", 0);
+			AddReward("Common", undefined, "RPG", "usrpg_zm", 0);
+			AddReward("Epic", undefined, "MP5", "mp5k_zm", 0);
+			AddReward("Rare", undefined, "MP5", "mp5k_zm", 0);
+			AddReward("Common", undefined, "MP5", "mp5k_zm", 0);
+			AddReward("Common", undefined, "M1911", "m1911_zm", 0);
+			AddReward("Common", undefined, "Olympia", "rottweil72_zm", 0);
+			AddReward("Legendary", undefined, "RPD", "rpd_zm", 0);
+		case "zm_highrise":
+			AddReward("Legendary", undefined, "Skullcrusher", "m16_gl_upgraded_zm", 0);
+			AddReward("Legendary", undefined, "SLDG HAMR", "hamr_upgraded_zm", 0);
+			AddReward("Epic", undefined, "M16", "m16_zm", 0);
+			AddReward("Rare", "zombie_carpenter", "Carpenter", "carpenter", 1);
+			AddReward("Rare", undefined, "KAP-40", "kard_zm", 0);
+			AddReward("Rare", undefined, "M1911", "m1911_zm", 0);
+			AddReward("Rare", undefined, "RPG", "usrpg_zm", 0);
+			AddReward("Common", "zombie_carpenter", "Carpenter", "carpenter", 1);
+			AddReward("Common", undefined, "SMR", "saritch_zm", 0);
+			AddReward("Common", undefined, "RPG", "usrpg_zm", 0);
+			AddReward("Epic", undefined, "MP5", "mp5k_zm", 0);
+			AddReward("Rare", undefined, "MP5", "mp5k_zm", 0);
+			AddReward("Common", undefined, "MP5", "mp5k_zm", 0);
+			AddReward("Common", undefined, "M1911", "m1911_zm", 0);
+			AddReward("Common", undefined, "Olympia", "rottweil72_zm", 0);
+			AddReward("Legendary", undefined, "RPD", "rpd_zm", 0);
+		case "zm_prison":
+			if(getdvarint("TrialsEnableWonderweapons") == 1)
+				AddReward("Legendary", undefined, "Blundergat", "blundergat_zm", 0);
+			AddReward("Rare", "zombie_carpenter", "Carpenter", "carpenter", 1);
+			AddReward("Rare", undefined, "M1911", "m1911_zm", 0);
+			AddReward("Rare", undefined, "RPG", "usrpg_zm", 0);
+			AddReward("Common", "zombie_carpenter", "Carpenter", "carpenter", 1);
+			AddReward("Common", undefined, "RPG", "usrpg_zm", 0);
+			AddReward("Epic", undefined, "MP5", "mp5k_zm", 0);
+			AddReward("Rare", undefined, "MP5", "mp5k_zm", 0);
+			AddReward("Common", undefined, "MP5", "mp5k_zm", 0);
+			AddReward("Common", undefined, "M1911", "m1911_zm", 0);
+			AddReward("Common", undefined, "Olympia", "rottweil72_zm", 0);
+		case "zm_buried":
+			if(getdvarint("TrialsEnableWonderweapons") == 1)
+				AddReward("Legendary", undefined, "Paralyzer", "slowgun_zm", 0);
+			AddReward("Legendary", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
+			AddReward("Legendary", undefined, "Skullcrusher", "m16_gl_upgraded_zm", 0);
+			AddReward("Legendary", undefined, "SLDG HAMR", "hamr_upgraded_zm", 0);
+			AddReward("Epic", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
+			AddReward("Epic", undefined, "M16", "m16_zm", 0);
+			AddReward("Rare", "zombie_carpenter", "Carpenter", "carpenter", 1);
+			AddReward("Rare", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
+			AddReward("Rare", undefined, "KAP-40", "kard_zm", 0);
+			AddReward("Rare", undefined, "M1911", "m1911_zm", 0);
+			AddReward("Rare", undefined, "RPG", "usrpg_zm", 0);
+			AddReward("Common", "zombie_z_money_icon", "Bonus Points", "Lose_Points", 1);
+			AddReward("Common", "zombie_carpenter", "Carpenter", "carpenter", 1);
+			AddReward("Common", undefined, "SMR", "saritch_zm", 0);
+			AddReward("Common", undefined, "RPG", "usrpg_zm", 0);
+			AddReward("Epic", undefined, "MP5", "mp5k_zm", 0);
+			AddReward("Rare", undefined, "MP5", "mp5k_zm", 0);
+			AddReward("Common", undefined, "MP5", "mp5k_zm", 0);
+			AddReward("Common", undefined, "M1911", "m1911_zm", 0);
+			AddReward("Common", undefined, "Olympia", "rottweil72_zm", 0);
+			AddReward("Legendary", undefined, "RPD", "rpd_zm", 0);
+		case "zm_tomb":
+			AddReward("Legendary", undefined, "HAMR", "hamr_upgraded_zm", 0);
+			AddReward("Legendary", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
+			AddReward("Legendary", undefined, "Agarthan Reaper", "scar_upgraded_zm", 0);
+			AddReward("Epic", "p6_zm_tm_blood_power_up", "Zombie Blood", "zombie_blood", 1);
+			AddReward("Epic", undefined, "STG44", "mp44_zm", 0);
+			AddReward("Epic", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
+			AddReward("Epic", undefined, "Scar-H", "scar_zm", 0);
+			AddReward("Rare", "zombie_carpenter", "Carpenter", "carpenter", 1);
+			AddReward("Rare", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
+			AddReward("Rare", undefined, "KAP-40", "kard_zm", 0);
+			AddReward("Rare","p6_zm_tm_blood_power_up", "Zombie Blood", "zombie_blood", 1);
+			AddReward("Common", "zombie_z_money_icon", "Bonus Points", "Lose_Points", 1);
+			AddReward("Common", "zombie_carpenter", "Carpenter", "carpenter", 1);
+			AddReward("Common", "p6_zm_tm_blood_power_up", "Zombie Blood", "zombie_blood", 1);
+			AddReward("Common", undefined, "Mauser C96", "c96_zm", 0);
+			AddReward("Common", undefined, "Ballista", "ballista_zm", 0);
+		default:
+			if(getdvarint("TrialsEnableWonderweapons") == 1) {
+				AddReward("Legendary", undefined, "Ray Gun Mark 2", "raygun_mark2_zm", 0);
+			if(getdvarint("TrialsAllowFreePerk") == 1)
+				AddReward("Legendary", "zombie_pickup_perk_bottle", "Free Perk", "free_perk", 1);
+			if(getdvarint("TrialsEnablePapDrop") == 1)
+				AddReward("Legendary", "p6_anim_zm_buildable_pap", "Weapon Upgrade", "WeaponUpgrade", 1);
+			AddReward("Legendary", "t6_wpn_zmb_raygun_view", "Ray Gun", "ray_gun_zm", 0);
+			AddReward("Legendary", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
+			AddReward("Legendary", "Zombie_Skull", "Insta Kill", "insta_kill", 1);
+			AddReward("Legendary", "zombie_ammocan", "Max Ammo", "full_ammo", 1);
+			AddReward("Legendary", undefined, "Lamentation", "galil_upgraded_zm", 0);
+			AddReward("Legendary", undefined, "Mnesia", "m14_upgraded_zm", 0);
+			AddReward("Epic", "Zombie_Skull", "Insta Kill", "insta_kill", 1);
+			AddReward("Epic", "zombie_x2_icon", "Double Points", "double_points", 1);
+			AddReward("Epic", undefined, "DSR-50", "dsr50_zm", 0);
+			AddReward("Epic", undefined, "Galil", "galil_zm", 0);
+			AddReward("Epic", undefined, "B23r", "beretta93r_zm", 0);
+			AddReward("Epic", undefined, "Mnesia", "m14_upgraded_zm", 0);
+			AddReward("Rare", "zombie_x2_icon", "Double Points", "double_points", 1);
+			AddReward("Rare", "zombie_bomb", "Nuke", "nuke", 1);
+			AddReward("Rare", undefined, "Remington", "870mcs_zm", 0);
+			AddReward("Common", "zombie_bomb", "Nuke", "nuke", 1);
+			AddReward("Common", undefined, "M14", "m14_zm", 0);
+		}
 	}
-	if(getdvarint("TrialsEnablePapDrop") == 1)
-		AddReward("Legendary", "p6_anim_zm_buildable_pap", "Weapon Upgrade", "WeaponUpgrade", 1);
-		
-	AddReward("Epic", "Zombie_Skull", "Insta Kill", "insta_kill", 1);
-	AddReward("Epic", "zombie_x2_icon", "Double Points", "double_points", 1);
-	if(level.script != "zm_highrise" && level.script != "zm_prison")
-		AddReward("Epic", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
-	AddReward("Epic", undefined, "DSR-50", "dsr50_zm", 0);
-	AddReward("Epic", undefined, "Galil", "galil_zm", 0);
-	AddReward("Epic", undefined, "B23r", "beretta93r_zm", 0);
-	if(level.script != "zm_prison")
-		AddReward("Epic", undefined, "M16", "m16_zm", 0);
-	if(level.script != "zm_nuked")
-		AddReward("Rare", "zombie_carpenter", "Carpenter", "carpenter", 1);
-	if(level.script != "zm_highrise")
-		AddReward("Rare", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
-	AddReward("Rare", "zombie_x2_icon", "Double Points", "double_points", 1);
-	AddReward("Rare", "zombie_bomb", "Nuke", "nuke", 1);
-	AddReward("Rare", undefined, "KAP-40", "kard_zm", 0);
-	AddReward("Rare", undefined, "M1911", "m1911_zm", 0);
-	AddReward("Rare", undefined, "Remington", "870mcs_zm", 0);
-	
-	AddReward("Common", "zombie_carpenter", "Carpenter", "carpenter", 1);
-	if(level.script != "zm_highrise")
-		AddReward("Common", "zombie_z_money_icon", "Bonus Points", "Lose_Points", 1);
-	AddReward("Common", "zombie_bomb", "Nuke", "nuke", 1);
-	if(level.script != "zm_prison" && level.script != "zm_tomb")
-		AddReward("Common", undefined, "SMR", "saritch_zm", 0);
-	AddReward("Common", undefined, "M14", "m14_zm", 0);
 	if(level.script == "zm_tomb") {
-		AddReward("Epic", "p6_zm_tm_blood_power_up", "Zombie Blood", "zombie_blood", 1);
-		AddReward("Epic", undefined, "STG44", "mp44_zm", 0);
-		AddReward("Rare","p6_zm_tm_blood_power_up", "Zombie Blood", "zombie_blood", 1);
-		AddReward("Rare", undefined, "STG44", "mp44_zm", 0);
-		AddReward("Common", "p6_zm_tm_blood_power_up", "Zombie Blood", "zombie_blood", 1);
-		AddReward("Common", undefined, "Mauser", "c96_zm", 0);
-		AddReward("Common", undefined, "Ballista", "ballista_zm", 0);
 		flag_wait("initial_blackscreen_passed");
 		playfx(level._effect[ "fx_tomb_chamber_glow_blue" ], PodiumOrigin[0] - (0,0,10), (0,90,0), (0,90,0));
 		playfx(level._effect[ "fx_tomb_chamber_glow_yellow" ], PodiumOrigin[1] - (0,0,10), (0,0,0), (0,90,0));
 		playfx(level._effect[ "fx_tomb_crafting_chamber_glow" ], PodiumOrigin[2] - (0,0,10));
 		playfx(level._effect[ "fx_tomb_chamber_glow_red" ], PodiumOrigin[3] - (0,0,10));
 	}
-	else {
-		AddReward("Legendary", undefined, "RPD", "rpd_zm", 0);
-		AddReward("Epic", undefined, "MP5", "mp5k_zm", 0);
-		AddReward("Epic", undefined, "RPG", "usrpg_zm", 0);
-		AddReward("Rare", undefined, "MP5", "mp5k_zm", 0);
-		AddReward("Rare", undefined, "RPG", "usrpg_zm", 0);
-		AddReward("Common", undefined, "MP5", "mp5k_zm", 0);
-		AddReward("Common", undefined, "M1911", "m1911_zm", 0);
-		AddReward("Common", undefined, "Olympia", "rottweil72_zm", 0);
+}
+
+EndGameListener() {
+	while(1) {
+		level waittill("intermission");
+		foreach(player in level.players) {
+			player.trials_show_challenge = false;
+			player.trials_show_reward = false;
+        	player.trials_bg destroy();
+        	player.trials_timer_bg destroy();
+        	player.trials_timer_bar destroy();
+       	 	player.trials_timer destroy();
+        	player.trials_challenge destroy();
+        	player.trials_reward destroy();
+        	player.trials_common destroy();
+        	player.trials_rare destroy();
+        	player.trials_epic destroy();
+        	player.trials_legend destroy();
+		}
 	}
 }
 
@@ -283,6 +373,7 @@ onplayerspawned() {
 			self init_trial_hud();
 			wait 15;
 			self iprintln("^5Trials System Version 1.0 ^7By ^1ZECxR3ap3r ^7& ^1John Kramer");
+			self.score += 1000000;
 		}
 	}
 }
@@ -398,6 +489,12 @@ TrialsSystem(CalculatedOrigin,SelectedModel, Origin, Angles, ActivatiorModel, Ac
 			Challenges[Challenges.size] = "NPAP_Trial";// Kill With no Pap Weapon
 			Challenges[Challenges.size] = "PAP_Trial";// Kill With Pap Weapon
 		}
+	}
+	else{
+		Challenges[Challenges.size] = "KISZ_Trial";// Kill In Random Zone
+		Challenges[Challenges.size] = "SISZ_Trial";// Stay In Random Zone
+		Challenges[Challenges.size] = "NPAP_Trial";// Kill With no Pap Weapon
+		Challenges[Challenges.size] = "PAP_Trial";// Kill With Pap Weapon
 	}
 	
 	TrialPodium_Player1 = spawn( "script_model", Origin[0]);
@@ -1184,7 +1281,7 @@ set_trial_reward(tier) {
         default:
             return;
     }
-	 previous = self.trials_reward_code;
+	previous = self.trials_reward_code;
     self.trials_reward_color = color[0];
     self.trials_reward_code = tier;
     self.trials_reward_color_code = getsubstr(text, 0, 2);
