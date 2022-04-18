@@ -100,4 +100,4 @@ This mod is technically **in beta** and might still have some bugs. We therefore
 - [Download GSC compiler](https://plutonium.pw/docs/modding/loading-mods/#requirements)
 - [Created by ZECxR3ap3r](https://forum.plutonium.pw/user/zecxr3ap3r)
 - [Discord & Support](https://discord.gg/Z5UsgDwSUf)
-- [Plutonium Forum Topic](https://forum.plutonium.pw/)
+- [Plutonium Forum Topic](https://forum.plutonium.pw/topic/19600/release-zombies-bo2-trials-system)
