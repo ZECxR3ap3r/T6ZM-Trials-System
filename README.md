@@ -89,7 +89,7 @@ This mod is technically **in beta** and might still have some bugs. We therefore
   - TranZit (Town)
   - Town
   - Farm
-  - Station
+  - Bus Station
 
 <br>
 
