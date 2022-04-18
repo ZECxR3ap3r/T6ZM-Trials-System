@@ -463,14 +463,12 @@ TrialsSystem(CalculatedOrigin,SelectedModel, Origin, Angles, ActivatiorModel, Ac
 			Challenges[Challenges.size] = "KISZ_Trial";// Kill In Random Zone
 			Challenges[Challenges.size] = "SISZ_Trial";// Stay In Random Zone
 			Challenges[Challenges.size] = "NPAP_Trial";// Kill With no Pap Weapon
-			Challenges[Challenges.size] = "PAP_Trial";// Kill With Pap Weapon
 		}
 	}
 	else{
 		Challenges[Challenges.size] = "KISZ_Trial";// Kill In Random Zone
 		Challenges[Challenges.size] = "SISZ_Trial";// Stay In Random Zone
 		Challenges[Challenges.size] = "NPAP_Trial";// Kill With no Pap Weapon
-		Challenges[Challenges.size] = "PAP_Trial";// Kill With Pap Weapon
 	}
 	
 	TrialPodium_Player1 = spawn( "script_model", Origin[0]);
@@ -567,7 +565,18 @@ cycle_randomize(indices) {
 
 MainModelAnimation(){// Teddy Floating
 	level endon("end_game");
-	while(1){
+	flag_wait( "start_zombie_round_logic" );
+	if(level.script == "zm_nuked") {
+		for( f = 0; f < 4; f++ ) {
+			playfxontag( level._effect[ "fx_ash_embers_up_lg" ], self, "tag_origin" );
+  			wait randomfloatrange( 0.1, 0.72 );
+  		}
+	}
+	if(level.script == "zm_highrise")
+		playfx( level._effect[ "fx_highrise_dragon_tower_glow_ric" ], self.origin);
+	if(level.script == "zm_buried")
+		playfx( level._effect[ "sq_tower_bolts" ], self.origin);
+	while(1) {
 		self moveto(self.origin + (0,0,20),randomfloatrange(0.5,4));
 		self waittill("movedone");
 		self moveto(self.origin + (0,0,-20),randomfloatrange(0.5,4));
@@ -630,8 +639,6 @@ ChallengeHandler(Zones,Challenge){
 	}
 	else if(Challenge == "NPAP_Trial")
 		ChallengeDescription = "Kill Zombies with a Non-Upgraded Weapon";
-	else if(Challenge == "PAP_Trial")
-		ChallengeDescription = "Kill Zombies with an Upgraded Weapon";
 	else if(Challenge == "NAIM_Trial")
 		ChallengeDescription = "Kill Zombies without Aiming";
 	else if(Challenge == "CR_Trial")
@@ -722,11 +729,6 @@ PlayerTrialHandlerKill(trial, Points, SpecificZone){
 		}
 		else if(trial == "NPAP_Trial") {
 			if(!self has_upgrade(self getcurrentweapon()) && zombie.damagemod == "MOD_RIFLE_BULLET" || !self has_upgrade(self getcurrentweapon()) && zombie.damagemod == "MOD_PISTOL_BULLET") {
-				self thread AddPlayerMagicPoints(Points);
-			}
-		}
-		else if(trial == "PAP_Trial") {
-			if(self has_upgrade(self getcurrentweapon()) && zombie.damagemod == "MOD_RIFLE_BULLET" || self has_upgrade(self getcurrentweapon()) && zombie.damagemod == "MOD_PISTOL_BULLET") {
 				self thread AddPlayerMagicPoints(Points);
 			}
 		}
