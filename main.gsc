@@ -101,8 +101,8 @@ init() {
     	PodiumOrigin = array((1416.2, 1364.68, 200.125), (1365.2, 1383.68, 200.125), (1307.2, 1403.68, 200.125), (1247.2, 1425.68, 200.125));
     	PodiumAngles = array((0, 0, 0), (0, 0, 0), (0,0,0), (0,0,0));
     	TrialsMainModel = "zombie_teddybear";
-    	TrialsMainOrigin = (1634.18, 2214.07, 100.125);
-    	TrialsMainAngles = (0, -110, 0);
+    	TrialsMainOrigin = (1405.07, 1651.54, 250.32);
+    	TrialsMainAngles = (0, -100, 0);
     	FXOriginOffset = (0,0,43);
     }
     else if(level.script == "zm_tomb") {
@@ -155,7 +155,7 @@ init() {
     }
 	level.ReaperTrialsActive = 0;
 	level thread TrialsSystem(FXOriginOffset,PodiumModel, PodiumOrigin, PodiumAngles, TrialsMainModel, TrialsMainOrigin, TrialsMainAngles);
-	level thread onPlayerConnect();
+	level thread On_Connect();
 	level thread EndGameListener();
 	
 	// Rewards (i know its a Mess)
@@ -181,6 +181,7 @@ init() {
 			AddReward("Common", undefined, "M1911", "m1911_zm", 0);
 			AddReward("Common", undefined, "Olympia", "rottweil72_zm", 0);
 			AddReward("Legendary", undefined, "RPD", "rpd_zm", 0);
+			break;
 		case "zm_nuked":
 			AddReward("Legendary", undefined, "Skullcrusher", "m16_gl_upgraded_zm", 0);
 			AddReward("Legendary", undefined, "SLDG HAMR", "hamr_upgraded_zm", 0);
@@ -196,6 +197,7 @@ init() {
 			AddReward("Common", undefined, "M1911", "m1911_zm", 0);
 			AddReward("Common", undefined, "Olympia", "rottweil72_zm", 0);
 			AddReward("Legendary", undefined, "RPD", "rpd_zm", 0);
+			break;
 		case "zm_highrise":
 			AddReward("Legendary", undefined, "Skullcrusher", "m16_gl_upgraded_zm", 0);
 			AddReward("Legendary", undefined, "SLDG HAMR", "hamr_upgraded_zm", 0);
@@ -213,6 +215,7 @@ init() {
 			AddReward("Common", undefined, "M1911", "m1911_zm", 0);
 			AddReward("Common", undefined, "Olympia", "rottweil72_zm", 0);
 			AddReward("Legendary", undefined, "RPD", "rpd_zm", 0);
+			break;
 		case "zm_prison":
 			if(getdvarint("TrialsEnableWonderweapons") == 1)
 				AddReward("Legendary", undefined, "Blundergat", "blundergat_zm", 0);
@@ -226,6 +229,7 @@ init() {
 			AddReward("Common", undefined, "MP5", "mp5k_zm", 0);
 			AddReward("Common", undefined, "M1911", "m1911_zm", 0);
 			AddReward("Common", undefined, "Olympia", "rottweil72_zm", 0);
+			break;
 		case "zm_buried":
 			if(getdvarint("TrialsEnableWonderweapons") == 1)
 				AddReward("Legendary", undefined, "Paralyzer", "slowgun_zm", 0);
@@ -249,8 +253,9 @@ init() {
 			AddReward("Common", undefined, "M1911", "m1911_zm", 0);
 			AddReward("Common", undefined, "Olympia", "rottweil72_zm", 0);
 			AddReward("Legendary", undefined, "RPD", "rpd_zm", 0);
+			break;
 		case "zm_tomb":
-			AddReward("Legendary", undefined, "HAMR", "hamr_upgraded_zm", 0);
+			AddReward("Legendary", undefined, "SLDG HAMR", "hamr_upgraded_zm", 0);
 			AddReward("Legendary", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
 			AddReward("Legendary", undefined, "Agarthan Reaper", "scar_upgraded_zm", 0);
 			AddReward("Epic", "p6_zm_tm_blood_power_up", "Zombie Blood", "zombie_blood", 1);
@@ -260,12 +265,13 @@ init() {
 			AddReward("Rare", "zombie_carpenter", "Carpenter", "carpenter", 1);
 			AddReward("Rare", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
 			AddReward("Rare", undefined, "KAP-40", "kard_zm", 0);
-			AddReward("Rare","p6_zm_tm_blood_power_up", "Zombie Blood", "zombie_blood", 1);
+			AddReward("Rare", "p6_zm_tm_blood_power_up", "Zombie Blood", "zombie_blood", 1);
 			AddReward("Common", "zombie_z_money_icon", "Bonus Points", "Lose_Points", 1);
 			AddReward("Common", "zombie_carpenter", "Carpenter", "carpenter", 1);
 			AddReward("Common", "p6_zm_tm_blood_power_up", "Zombie Blood", "zombie_blood", 1);
 			AddReward("Common", undefined, "Mauser C96", "c96_zm", 0);
 			AddReward("Common", undefined, "Ballista", "ballista_zm", 0);
+			break;
 		default:
 			if(getdvarint("TrialsEnableWonderweapons") == 1) {
 				AddReward("Legendary", undefined, "Ray Gun Mark 2", "raygun_mark2_zm", 0);
@@ -290,6 +296,7 @@ init() {
 			AddReward("Rare", undefined, "Remington", "870mcs_zm", 0);
 			AddReward("Common", "zombie_bomb", "Nuke", "nuke", 1);
 			AddReward("Common", undefined, "M14", "m14_zm", 0);
+			break;
 		}
 	}
 	if(level.script == "zm_tomb") {
@@ -299,43 +306,6 @@ init() {
 		playfx(level._effect[ "fx_tomb_crafting_chamber_glow" ], PodiumOrigin[2] - (0,0,10));
 		playfx(level._effect[ "fx_tomb_chamber_glow_red" ], PodiumOrigin[3] - (0,0,10));
 	}
-}
-
-EndGameListener() {
-	while(1) {
-		level waittill("intermission");
-		foreach(player in level.players) {
-			player.trials_show_challenge = false;
-			player.trials_show_reward = false;
-        	player.trials_bg destroy();
-        	player.trials_timer_bg destroy();
-        	player.trials_timer_bar destroy();
-       	 	player.trials_timer destroy();
-        	player.trials_challenge destroy();
-        	player.trials_reward destroy();
-        	player.trials_common destroy();
-        	player.trials_rare destroy();
-        	player.trials_epic destroy();
-        	player.trials_legend destroy();
-		}
-	}
-}
-
-AddReward(TrialRank, RewardModel, RewardHintname, RewardCodename, Powerup) {
-	if(!isdefined(level.Rewards_List))
-		level.Rewards_List = [];
-	
-	Reward = SpawnStruct();
-	Reward.Rank = TrialRank;
-	if(isdefined(RewardModel))
-		Reward.Model = RewardModel;
-	else
-		Reward.Model = getweaponmodel(RewardCodename);
-	Reward.Hint = RewardHintname;
-	Reward.Name = RewardCodename;
-	Reward.Powerup = Powerup;
-		
-	level.Rewards_List[level.Rewards_List.size] = Reward;
 }
 
 init_trial_hud() {
@@ -354,15 +324,15 @@ init_trial_hud() {
     self.trials_init = true;
 }
 
-onplayerconnect() {
+On_Connect() {
 	level endon("end_game");
 	for ( ;; ) {
 		level waittill( "connected", player );
-		player thread onplayerspawned();
+		player thread On_Spawned();
     }
 }
 
-onplayerspawned() {
+On_Spawned() {
 	level endon("end_game");
 	self endon( "disconnect" );
 	for ( ;; ) {
@@ -533,7 +503,7 @@ TrialsSystem(CalculatedOrigin,SelectedModel, Origin, Angles, ActivatiorModel, Ac
 	// All Zones For Challenges
 	Zones = GetEntArray("player_volume", "script_noteworthy");
 	// Zones check for Town
-	if ( getDvar( "ui_zm_mapstartlocation" ) == "town" ){
+	if (level.script == "zm_transit" && getDvar( "ui_zm_mapstartlocation" ) == "town" ){
 		for(i = 0;i < Zones.size;i++){
 			if(Zones[i].targetname == "zone_tow" || Zones[i].targetname == "zone_bar" || Zones[i].targetname == "zone_ban" || Zones[i].targetname == "zone_town_north" || Zones[i].targetname == "zone_town_west" || Zones[i].targetname == "zone_town_east" || Zones[i].targetname == "zone_town_barber" || Zones[i].targetname == "zone_town_south" ){
 				if(!isdefined(ZonesForSurvival))
@@ -614,17 +584,27 @@ ChallengeHandler(Zones,Challenge){
 		Num = randomintrange(0, Zones.size);
 		ChoosenZone = Zones[Num];
 		ZoneName = get_zone_name(ChoosenZone.targetname);
+		if(!isdefined(ZoneName)) {
+			Num = randomintrange(0, Zones.size);
+			ChoosenZone = Zones[Num];
+			ZoneName = get_zone_name(ChoosenZone.targetname);
+		}
 		ChallengeDescription = "Kill Zombies at Location\n^8"+ZoneName;
 		PositiveChallengeDescription = "Kill Zombies at Location\n^2"+ZoneName;
-		Time = 120;
+		Time = 10;
 	}
 	else if(Challenge == "SISZ_Trial"){
 		Num = randomintrange(0, Zones.size);
 		ChoosenZone = Zones[Num];
 		ZoneName = get_zone_name(ChoosenZone.targetname);
+		if(!isdefined(ZoneName)) {
+			Num = randomintrange(0, Zones.size);
+			ChoosenZone = Zones[Num];
+			ZoneName = get_zone_name(ChoosenZone.targetname);
+		}
 		ChallengeDescription = "Stay at Location\n^8"+ZoneName;
 		PositiveChallengeDescription = "Stay at Location\n^2"+ZoneName;
-		Time = 120;
+		Time = 10;
 	}
 	else if(Challenge == "GO_Trial")
 		ChallengeDescription = "Kill Zombies with Grenades";
@@ -671,7 +651,7 @@ ChallengeHandler(Zones,Challenge){
 		players[i] toggle_trial_challenge_hud();
 		players[i] set_trial_challenge(ChallengeDescription);
 		players[i] set_trial_timer(time);
-		
+		players[i] iprintln(ChoosenZone.targetname);
 		if(isdefined(ChoosenZone))
 			players[i] thread set_trial_location(ChoosenZone, ChallengeDescription, PositiveChallengeDescription);
 	}
@@ -709,90 +689,90 @@ PlayerTrialHandlerKill(trial, Points, SpecificZone){
 		self waittill( "zom_kill", zombie);
 		if(trial == "K_Trial")
 			self thread AddPlayerMagicPoints(Points);
-		else if(trial == "HK_Trial"){
+		else if(trial == "HK_Trial") {
 			if ( zombie.damagelocation == "head" || zombie.damagelocation == "helmet" || zombie.damagelocation == "neck" ) {
 				self thread AddPlayerMagicPoints(Points);
 			}
 		}
-		else if(trial == "MK_Trial"){
+		else if(trial == "MK_Trial") {
 			if ( zombie.damagemod == "MOD_MELEE" || zombie.damagemod == "MOD_IMPACT" ) {
 				self thread AddPlayerMagicPoints(Points);
 			}
 		}
-		else if(trial == "KISZ_Trial"){
-			if(self istouching(SpecificZone) && zombie istouching(SpecificZone)){
+		else if(trial == "KISZ_Trial") {
+			if(self istouching(SpecificZone) && zombie istouching(SpecificZone)) {
 				self thread AddPlayerMagicPoints(Points);
 			}
 		}
-		else if(trial == "GO_Trial"){
-			if ( zombie.damagemod == "MOD_GRENADE" || zombie.damagemod == "MOD_GRENADE_SPLASH" || zombie.damagemod == "MOD_EXPLOSIVE" ){
+		else if(trial == "GO_Trial") {
+			if(zombie.damagemod == "MOD_GRENADE" || zombie.damagemod == "MOD_GRENADE_SPLASH" || zombie.damagemod == "MOD_EXPLOSIVE" ) {
 				self thread AddPlayerMagicPoints(Points);
 			}
 		}
-		else if(trial == "C_Trial"){
-			if(self GetStance() == "crouch"){
+		else if(trial == "C_Trial") {
+			if(self GetStance() == "crouch") {
 				self thread AddPlayerMagicPoints(Points);
 			}
 		}
-		else if(trial == "NPAP_Trial"){
-			if(!self has_upgrade(self getcurrentweapon()) && zombie.damagemod == "MOD_RIFLE_BULLET" || !self has_upgrade(self getcurrentweapon()) && zombie.damagemod == "MOD_PISTOL_BULLET"){
+		else if(trial == "NPAP_Trial") {
+			if(!self has_upgrade(self getcurrentweapon()) && zombie.damagemod == "MOD_RIFLE_BULLET" || !self has_upgrade(self getcurrentweapon()) && zombie.damagemod == "MOD_PISTOL_BULLET") {
 				self thread AddPlayerMagicPoints(Points);
 			}
 		}
-		else if(trial == "PAP_Trial"){
-			if(self has_upgrade(self getcurrentweapon()) && zombie.damagemod == "MOD_RIFLE_BULLET" || self has_upgrade(self getcurrentweapon()) && zombie.damagemod == "MOD_PISTOL_BULLET"){
+		else if(trial == "PAP_Trial") {
+			if(self has_upgrade(self getcurrentweapon()) && zombie.damagemod == "MOD_RIFLE_BULLET" || self has_upgrade(self getcurrentweapon()) && zombie.damagemod == "MOD_PISTOL_BULLET") {
 				self thread AddPlayerMagicPoints(Points);
 			}
 		}
-		else if(trial == "NAIM_Trial"){
+		else if(trial == "NAIM_Trial") {
 			if(!isads(self)){
 				self thread AddPlayerMagicPoints(Points);
 			}
 		}
-		else if(trial == "CR_Trial"){
-			if(distancesquared(self.origin,zombie.origin) <= 20000){
+		else if(trial == "CR_Trial") {
+			if(distancesquared(self.origin,zombie.origin) <= 20000) {
 				self thread AddPlayerMagicPoints(Points);
 			}
 		}
-		else if(trial == "BR_Trial"){
-			if(distancesquared(self.origin,zombie.origin) >= 180000){
+		else if(trial == "BR_Trial") {
+			if(distancesquared(self.origin,zombie.origin) >= 180000) {
 				self thread AddPlayerMagicPoints(Points);
 			}
 		}
-		else if(trial == "PK_Trial"){
-			if(self GetStance() == "prone"){
+		else if(trial == "PK_Trial") {
+			if(self GetStance() == "prone") {
 				self thread AddPlayerMagicPoints(Points);
 			}
 		}
 	}
 }
 // All Time Based Challenges Come in here
-PlayerTrialHandlerTime(trial, Points, SpecificZone){
+PlayerTrialHandlerTime(trial, Points, SpecificZone) {
 	level endon("game_ended");
 	self endon("TrialOver");
 	while(1){
-		if(trial == "SISZ_Trial"){
-			if(isdefined(SpecificZone) && self istouching(SpecificZone)){
+		if(trial == "SISZ_Trial") {
+			if(isdefined(SpecificZone) && self istouching(SpecificZone)) {
 				self thread AddPlayerMagicPoints(Points);
 			}
 		}
-		else if(trial == "TD_Trial"){
-			if((self.health / self.maxhealth) <= 0.8){
+		else if(trial == "TD_Trial") {
+			if((self.health / self.maxhealth) <= 0.8) {
 				self thread AddPlayerMagicPoints(Points);
 			}
 		}
-		else if(trial == "NH_Trial"){
-			if(self.health == self.maxhealth){
+		else if(trial == "NH_Trial") {
+			if(self.health == self.maxhealth) {
 				self thread AddPlayerMagicPoints(Points);
 			}
-			else{
+			else {
 				wait 10;
 			}
 		}
-		else if(trial == "BRS_Trial"){
+		else if(trial == "BRS_Trial") {
 			level waittill("spent_points", player, PointsSpent);
-			if(Player == self){
-				if(PointsSpent >= 100){
+			if(Player == self) {
+				if(PointsSpent >= 100) {
 					self thread AddPlayerMagicPoints(Points);
 				}
 			}
@@ -809,7 +789,7 @@ PodiumSetupTrigger(CalculatedOrigin,Index){
 		trigger = Spawn( "trigger_radius", self.origin + (0, 0, 30), 0, 30, 30 );
 	trigger SetCursorHint( "HINT_NOICON" );
 	trigger thread ShowToSpecific(CalculatedOrigin,Index);
-	while(1){
+	while(1) {
 		players = GetPlayers();
 		if(players[Index].ReaperTrialsCurrentMagic >= 25)
 			reward_level = "^2Common";
@@ -1383,16 +1363,51 @@ ShowToSpecific(FXOrigin,Index){
 	}
 }
 
-get_zone_name(key) {
+EndGameListener() {
+	while(1) {
+		level waittill("intermission");
+		foreach(player in level.players) {
+			player.trials_show_challenge = false;
+			player.trials_show_reward = false;
+        	player.trials_bg destroy();
+        	player.trials_timer_bg destroy();
+        	player.trials_timer_bar destroy();
+       	 	player.trials_timer destroy();
+        	player.trials_challenge destroy();
+        	player.trials_reward destroy();
+        	player.trials_common destroy();
+        	player.trials_rare destroy();
+        	player.trials_epic destroy();
+        	player.trials_legend destroy();
+		}
+	}
+}
 
+AddReward(TrialRank, RewardModel, RewardHintname, RewardCodename, Powerup) {
+	if(!isdefined(level.Rewards_List))
+		level.Rewards_List = [];
+	
+	Reward = SpawnStruct();
+	Reward.Rank = TrialRank;
+	if(isdefined(RewardModel))
+		Reward.Model = RewardModel;
+	else
+		Reward.Model = getweaponmodel(RewardCodename);
+	Reward.Hint = RewardHintname;
+	Reward.Name = RewardCodename;
+	Reward.Powerup = Powerup;
+		
+	level.Rewards_List[level.Rewards_List.size] = Reward;
+}
+
+get_zone_name(key) {
     // Caching and array lookup is way more efficient
     if (isdefined(level.zone_names))
         return level.zone_names[key];
-
+	
     level.zone_names = [];
 
     switch(level.script) {
-
         case "zm_transit":
             level.zone_names["zone_pri"] = "Bus Depot";
             level.zone_names["zone_pri2"] = "Bus Depot Hallway";
@@ -1445,7 +1460,7 @@ get_zone_name(key) {
             level.zone_names["zone_amb_bridge"] = "Bridge";
             level.zone_names["zone_trans_1"] = "Road Before Bus Depot";
             break;
-
+        
         case "zm_nuked":
             level.zone_names["culdesac_yellow_zone"] = "Yellow House Cul-de-sac";
             level.zone_names["culdesac_green_zone"] = "Green House Cul-de-sac";
@@ -1458,7 +1473,7 @@ get_zone_name(key) {
             level.zone_names["openhouse2_backyard_zone"] = "Yellow House Backyard";
             level.zone_names["ammo_door_zone"] = "Yellow House Backyard Door";
             break;
-
+        
         case "zm_highrise":
             level.zone_names["zone_green_start"] = "Green Highrise Level 3b";
             level.zone_names["zone_green_escape_pod"] = "Escape Pod";
@@ -1490,7 +1505,7 @@ get_zone_name(key) {
             level.zone_names["zone_blue_level1b"] = "Upper Blue Highrise Level 2b";
             level.zone_names["zone_blue_level1c"] = "Upper Blue Highrise Level 2c";
             break;
-
+        
         case "zm_prison":
             level.zone_names["zone_start"] = "D-Block";
             level.zone_names["zone_library"] = "Library";
@@ -1521,7 +1536,7 @@ get_zone_name(key) {
             level.zone_names["zone_golden_gate_bridge"] = "Golden Gate Bridge";
             level.zone_names["zone_gondola_ride"] = "Gondola";
             break;
-
+        
         case "zm_buried":
             level.zone_names["zone_start"] = "Processing";
             level.zone_names["zone_start_lower"] = "Lower Processing";
@@ -1566,7 +1581,7 @@ get_zone_name(key) {
             level.zone_names["zone_maze"] = "Maze";
             level.zone_names["zone_maze_staircase"] = "Maze Staircase";
             break;
-
+        
         case "zm_tomb":
             level.zone_names["zone_start"] = "Lower Laboratory";
             level.zone_names["zone_start_a"] = "Upper Laboratory";
@@ -1627,22 +1642,22 @@ get_zone_name(key) {
             level.zone_names["zone_nml_12"] = "Generator 4 Right Footstep";
             level.zone_names["zone_nml_12a"] = "zone_nml_12a";
             level.zone_names["zone_nml_16"] = "Excavation Site Front Path";
-            level.zone_names["zone_nml_16a"] = "zone_nml_16a";
+            //level.zone_names["zone_nml_16a"] = "zone_nml_16a";
             level.zone_names["zone_nml_17"] = "Excavation Site Back Path";
-            level.zone_names["zone_nml_17a"] = "zone_nml_17a";
+            //level.zone_names["zone_nml_17a"] = "zone_nml_17a";
             level.zone_names["zone_nml_18"] = "Excavation Site Level 3";
             level.zone_names["zone_nml_19"] = "Excavation Site Level 2";
             level.zone_names["ug_bottom_zone"] = "Excavation Site Level 1";
             level.zone_names["zone_nml_13"] = "Generator 5 To Generator 6 Path";
             level.zone_names["zone_nml_14"] = "Generator 4 To Generator 6 Path";
             level.zone_names["zone_nml_15"] = "Generator 6 Entrance";
-            level.zone_names["zone_nml_15a"] = "zone_nml_15a";
+            //level.zone_names["zone_nml_15a"] = "zone_nml_15a";
             level.zone_names["zone_village_0"] = "Generator 6 Left Footstep";
             level.zone_names["zone_village_5"] = "Generator 6 Tank Route 1";
             level.zone_names["zone_village_5a"] = "Generator 6 Tank Route 2";
             level.zone_names["zone_village_5b"] = "Generator 6 Tank Route 3";
             level.zone_names["zone_village_1"] = "Generator 6 Tank Route 4";
-            level.zone_names["zone_village_1a"] = "zone_village_1a";
+            //level.zone_names["zone_village_1a"] = "zone_village_1a";
             level.zone_names["zone_village_4b"] = "Generator 6 Tank Route 5";
             level.zone_names["zone_village_4a"] = "Generator 6 Tank Route 6";
             level.zone_names["zone_village_4"] = "Generator 6 Tank Route 7";
@@ -1651,11 +1666,11 @@ get_zone_name(key) {
             level.zone_names["zone_village_3a"] = "Generator 6";
             level.zone_names["zone_village_3b"] = "zone_village_3b";
             level.zone_names["zone_ice_stairs"] = "Ice Tunnel";
-            level.zone_names["zone_ice_stairs_1"] = "zone_ice_stairs_1";
+            //level.zone_names["zone_ice_stairs_1"] = "zone_ice_stairs_1";
             level.zone_names["zone_bunker_6"] = "Above Generator 3 Bunker";
             level.zone_names["zone_nml_20"] = "Above No Man's Land";
             level.zone_names["zone_village_6"] = "Behind Church";
-            level.zone_names["zone_village_6a"] = "zone_village_6a";
+            //level.zone_names["zone_village_6a"] = "zone_village_6a";
             level.zone_names["zone_chamber_0"] = "The Crazy Place Lightning Chamber";
             level.zone_names["zone_chamber_1"] = "The Crazy Place Lightning & Ice";
             level.zone_names["zone_chamber_2"] = "The Crazy Place Ice Chamber";
