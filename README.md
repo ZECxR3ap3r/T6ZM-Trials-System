@@ -16,7 +16,7 @@
 
 ## Features
 
-🎲 15 Random and unique challenges
+🎲 16 Random and unique challenges
 
 🎁 Earn up to 30 rewards across 4 tiers
 
