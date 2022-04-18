@@ -59,13 +59,14 @@ This mod is technically **in beta** and might still have some bugs. We therefore
 
 ## 🗺️ Supported Maps
 
-- Mob of the Dead
-- Nuketown
-- Buried
-- Die Rise
-- Origins
+- Mob of the Dead (Rooftop 4 Electric Chairs & Trap Activate Model on the Wall)
+- Nuketown (Spawn Room Yellow House 4 Mannequins & Teddy)
+- Buried (Church Top)
+- Die Rise (Second Building near MP5 Wallbuy 4 Lion Statues & Teddy)
+- Origins (Generator 3, 4 Challenge Chests)
 - Green Run
-  - TranZit
+  - TranZit (Town)
   - Town
   - Farm
+  - Station
 
