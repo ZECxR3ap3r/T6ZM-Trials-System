@@ -50,8 +50,6 @@ This mod is technically **in beta** and might still have some bugs. We therefore
 
 <br>
 
-## 🤯 Guide
-
 ## 🧩 Installation
 - Step 1 Compile the file main.gsc with a GSC Compiler / or use the Already Compiled file (compiled.gsc)
 - Step 2 Move the Compiled file in your Directory %localappdata%\Plutonium\storage\t6\scripts\zm\
