@@ -182,6 +182,7 @@ init() {
 			AddReward("Common", undefined, "Olympia", "rottweil72_zm", 0);
 			AddReward("Legendary", undefined, "RPD", "rpd_zm", 0);
 			break;
+		
 		case "zm_nuked":
 			AddReward("Legendary", undefined, "Skullcrusher", "m16_gl_upgraded_zm", 0);
 			AddReward("Legendary", undefined, "SLDG HAMR", "hamr_upgraded_zm", 0);
@@ -198,6 +199,7 @@ init() {
 			AddReward("Common", undefined, "Olympia", "rottweil72_zm", 0);
 			AddReward("Legendary", undefined, "RPD", "rpd_zm", 0);
 			break;
+		
 		case "zm_highrise":
 			AddReward("Legendary", undefined, "Skullcrusher", "m16_gl_upgraded_zm", 0);
 			AddReward("Legendary", undefined, "SLDG HAMR", "hamr_upgraded_zm", 0);
@@ -216,6 +218,7 @@ init() {
 			AddReward("Common", undefined, "Olympia", "rottweil72_zm", 0);
 			AddReward("Legendary", undefined, "RPD", "rpd_zm", 0);
 			break;
+		
 		case "zm_prison":
 			if(getdvarint("TrialsEnableWonderweapons") == 1)
 				AddReward("Legendary", undefined, "Blundergat", "blundergat_zm", 0);
@@ -230,6 +233,7 @@ init() {
 			AddReward("Common", undefined, "M1911", "m1911_zm", 0);
 			AddReward("Common", undefined, "Olympia", "rottweil72_zm", 0);
 			break;
+		
 		case "zm_buried":
 			if(getdvarint("TrialsEnableWonderweapons") == 1)
 				AddReward("Legendary", undefined, "Paralyzer", "slowgun_zm", 0);
@@ -254,6 +258,7 @@ init() {
 			AddReward("Common", undefined, "Olympia", "rottweil72_zm", 0);
 			AddReward("Legendary", undefined, "RPD", "rpd_zm", 0);
 			break;
+		
 		case "zm_tomb":
 			AddReward("Legendary", undefined, "SLDG HAMR", "hamr_upgraded_zm", 0);
 			AddReward("Legendary", "zombie_z_money_icon", "Bonus Points", "Bonus_Points", 1);
@@ -272,6 +277,7 @@ init() {
 			AddReward("Common", undefined, "Mauser C96", "c96_zm", 0);
 			AddReward("Common", undefined, "Ballista", "ballista_zm", 0);
 			break;
+		
 		default:
 			if(getdvarint("TrialsEnableWonderweapons") == 1) {
 				AddReward("Legendary", undefined, "Ray Gun Mark 2", "raygun_mark2_zm", 0);
@@ -342,8 +348,7 @@ On_Spawned() {
 			self.ReaperTrialsCurrentMagic = 0;
 			self init_trial_hud();
 			wait 15;
-			self iprintln("^5Trials System Version 1.0 ^7By ^1ZECxR3ap3r ^7& ^1John Kramer");
-			self.score += 1000000;
+			self iprintln("^5Trials System ^7BETA ^5Version ^7\nBy ^5ZECxR3ap3r ^7& ^5John Kramer");
 		}
 	}
 }
@@ -584,7 +589,7 @@ ChallengeHandler(Zones,Challenge){
 		Num = randomintrange(0, Zones.size);
 		ChoosenZone = Zones[Num];
 		ZoneName = get_zone_name(ChoosenZone.targetname);
-		if(!isdefined(ZoneName)) {
+		if(!isdefined(ZoneName) || isdefined(ZoneName) && ZoneName == "") {
 			Num = randomintrange(0, Zones.size);
 			ChoosenZone = Zones[Num];
 			ZoneName = get_zone_name(ChoosenZone.targetname);
@@ -597,7 +602,7 @@ ChallengeHandler(Zones,Challenge){
 		Num = randomintrange(0, Zones.size);
 		ChoosenZone = Zones[Num];
 		ZoneName = get_zone_name(ChoosenZone.targetname);
-		if(!isdefined(ZoneName)) {
+		if(!isdefined(ZoneName) || isdefined(ZoneName) && ZoneName == "") {
 			Num = randomintrange(0, Zones.size);
 			ChoosenZone = Zones[Num];
 			ZoneName = get_zone_name(ChoosenZone.targetname);
@@ -1309,6 +1314,9 @@ set_trial_timer(time) {
 }
 
 AddPlayerMagicPoints(num){
+	if(isdefined(self.revivetrigger)) {
+		return;
+	}
 	self.ReaperTrialsCurrentMagic += num;
 	self draw_trial_progress();
 	if(self.ReaperTrialsCurrentMagic >= 100)
