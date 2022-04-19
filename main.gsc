@@ -664,7 +664,6 @@ ChallengeHandler(Zones,Challenge){
 		players[i] toggle_trial_challenge_hud();
 		players[i] set_trial_challenge(ChallengeDescription);
 		players[i] set_trial_timer(time);
-		players[i] iprintln(ChoosenZone.targetname);
 		if(isdefined(ChoosenZone))
 			players[i] thread set_trial_location(ChoosenZone, ChallengeDescription, PositiveChallengeDescription);
 	}
