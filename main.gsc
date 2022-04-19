@@ -344,8 +344,8 @@ on_spawned() {
 	self endon( "disconnect" );
 	for ( ;; ) {
 		self waittill( "spawned_player" );
-		if(!isdefined(self.initial_spawn)) {
-			self.initial_spawn = 1;
+		if(!isdefined(self.initial_spawn_c)) {
+			self.initial_spawn_c = 1;
 			self.ReaperTrialsCurrentMagic = 0;
 			self init_trial_hud();
 			wait 15;
