@@ -342,9 +342,10 @@ on_connect() {
 on_spawned() {
 	level endon("end_game");
 	self endon( "disconnect" );
+	self.initial_spawn_c = 0;
 	for ( ;; ) {
 		self waittill( "spawned_player" );
-		if(!isdefined(self.initial_spawn_c)) {
+		if(self.initial_spawn_c == 0) {
 			self.initial_spawn_c = 1;
 			self.ReaperTrialsCurrentMagic = 0;
 			self init_trial_hud();
