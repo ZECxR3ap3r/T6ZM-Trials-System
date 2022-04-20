@@ -26,6 +26,8 @@
 
 ⚖️ Personal reward podium for each player
 
+🧑🏻‍🤝‍🧑🏻 Supports up to 8 players (split between 4 reward podiums)
+
 ⚡ Server and client compatible
 
 🛠️ Fully customizable and expandable
@@ -89,7 +91,7 @@ This mod is technically **in beta** and might still have some bugs. We therefore
   - TranZit (Town)
   - Town
   - Farm
-  - Bus Station
+  - Bus Depot
 
 <br>
 
