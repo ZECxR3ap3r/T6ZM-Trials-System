@@ -19,11 +19,13 @@
 #include maps/mp/zombies/_zm_magicbox;
 #include maps/mp/zombies/_zm_power;
 #include maps/mp/zombies/_zm_powerups;
+#include maps/mp/animscripts/zm_utility;
 
 // Trials System by ZECxR3ap3r & John Kramer
+// V1.0.1
 
 init() {
-	// Precaching
+	// Precaching Models
 	precachemodel("t6_wpn_zmb_jet_gun_world");
 	precachemodel("zombie_pickup_perk_bottle");
 	precachemodel("t6_wpn_zmb_raygun_view");
@@ -31,6 +33,7 @@ init() {
 	precachemodel("collision_wall_256x256x10_standard");
 	precachemodel("p6_zm_hr_lion_statue_base");
 	precachemodel("p6_zm_hr_lion_statue");
+	// Precaching Shaders
 	precacheshader("gradient");
 	precacheshader("white");
 	precacheshader("menu_mp_star_rating");
@@ -153,12 +156,12 @@ init() {
     	TrialsMainAngles = (0, -35, 0);
     	FXOriginOffset = (0,2,55);
     }
+    // Main Setup
 	level.ReaperTrialsActive = 0;
 	level thread TrialsSystem(FXOriginOffset,PodiumModel, PodiumOrigin, PodiumAngles, TrialsMainModel, TrialsMainOrigin, TrialsMainAngles);
 	level thread on_connect();
 	level thread EndGameListener();
-	
-	// Rewards
+	// Rewards Map Specific
 	switch(level.script) {
 		case "zm_transit":
 			AddReward("Legendary", undefined, "Skullcrusher", "m16_gl_upgraded_zm", 0);
@@ -303,12 +306,36 @@ init() {
 	AddReward("Rare", undefined, "Remington", "870mcs_zm", 0);
 	AddReward("Common", "zombie_bomb", "Nuke", "nuke", 1);
 	AddReward("Common", undefined, "M14", "m14_zm", 0);
+	// Lights for Origins Player Podiums
 	if(level.script == "zm_tomb") {
 		flag_wait("initial_blackscreen_passed");
 		playfx(level._effect[ "fx_tomb_chamber_glow_blue" ], PodiumOrigin[0] - (0,0,10), (0,90,0), (0,90,0));
 		playfx(level._effect[ "fx_tomb_chamber_glow_yellow" ], PodiumOrigin[1] - (0,0,10), (0,0,0), (0,90,0));
 		playfx(level._effect[ "fx_tomb_crafting_chamber_glow" ], PodiumOrigin[2] - (0,0,10));
 		playfx(level._effect[ "fx_tomb_chamber_glow_red" ], PodiumOrigin[3] - (0,0,10));
+	}
+}
+
+on_connect() {
+	level endon("end_game");
+	for ( ;; ) {
+		level waittill( "connected", player );
+		player thread on_spawned();
+    }
+}
+
+on_spawned() {
+	level endon("end_game");
+	self endon( "disconnect" );
+	self.initial_spawn_c = 0;
+	for ( ;; ) {
+		self waittill( "spawned_player" );
+		if(self.initial_spawn_c == 0) {
+			self.initial_spawn_c = 1;
+			self.board_repair = 0;
+			self.ReaperTrialsCurrentMagic = 0;
+			self init_trial_hud();
+		}
 	}
 }
 
@@ -331,38 +358,18 @@ init_trial_hud() {
     self.trials_init = true;
 }
 
-on_connect() {
-	level endon("end_game");
-	for ( ;; ) {
-		level waittill( "connected", player );
-		player thread on_spawned();
-    }
-}
-
-on_spawned() {
-	level endon("end_game");
-	self endon( "disconnect" );
-	self.initial_spawn_c = 0;
-	for ( ;; ) {
-		self waittill( "spawned_player" );
-		if(self.initial_spawn_c == 0) {
-			self.initial_spawn_c = 1;
-			self.ReaperTrialsCurrentMagic = 0;
-			self init_trial_hud();
-			wait 15;
-			self iprintln("^5Trials System ^7BETA ^5Version ^7\nBy ^5ZECxR3ap3r ^7& ^5John Kramer");
-		}
-	}
-}
-
-TriggerRewardHandler(player, Name, Powerup) {
+TriggerRewardHandler(player, Name, Powerup, Hint) {
 	level endon("end_game");
 	self endon("Timeout");
 	self endon("Grabbed");
-	while(1){
-		if(player usebuttonpressed() && player istouching(self)){
+	players = getplayers();
+	while(1) {
+		self waittill("trigger", player);
+		if(player usebuttonpressed()) {
+			if(isdefined(self.sharedreward))
+				self.sharedreward = undefined;// Trigger Again only Visible for that Specific Player
 			if(Powerup == 0){
-				if(Name == "ray_gun_zm" && player has_weapon_or_upgrade("raygun_mark2_zm") || Name == "Mark2" && player has_weapon_or_upgrade("ray_gun_zm")){
+				if(Name == "ray_gun_zm" && player has_weapon_or_upgrade("raygun_mark2_zm") || Name == "Mark2" && player has_weapon_or_upgrade("ray_gun_zm")) {
 					player playlocalsound( level.zmb_laugh_alias );
 					self notify("Grabbed");
 				}
@@ -370,15 +377,16 @@ TriggerRewardHandler(player, Name, Powerup) {
 					player playlocalsound( level.zmb_laugh_alias );
 					self notify("Grabbed");
 				}
+				weapon_limit = get_player_weapon_limit( player );
 				primaryweapons = player getweaponslistprimaries();
-				if ( isDefined( primaryweapons ) && primaryweapons.size > 1 )
+				if ( isDefined( primaryweapons ) && primaryweapons.size >= weapon_limit )
 					player takeweapon(player getcurrentweapon());
 				wait 0.1;
 				player giveweapon(Name);
 				player switchtoweapon(Name);
 				self notify("Grabbed");
 			}
-			else{
+			else {
 				wait 0.1;
 				if(Name == "free_perk")
 					free_perk = player maps/mp/zombies/_zm_perks::give_random_perk();
@@ -386,9 +394,9 @@ TriggerRewardHandler(player, Name, Powerup) {
 					player.score += randomintrange( 1, 50 ) * 100;
 				else if(Name == "Lose_Points")
 					player.score -= randomintrange( 1, 50 ) * 100;
-				else if(Name == "WeaponUpgrade"){
+				else if(Name == "WeaponUpgrade") {
 					weapon = player get_upgrade_weapon( player getcurrentweapon(), 0 );
-					if(IsDefined( weapon )){
+					if(IsDefined( weapon )) {
 						player takeweapon( player getcurrentweapon());
 						player giveweapon( weapon, 0, player get_pack_a_punch_weapon_options( weapon ) );
 						player givestartammo( weapon );
@@ -403,7 +411,16 @@ TriggerRewardHandler(player, Name, Powerup) {
 				self notify("Grabbed");
 			}
 		}
-		wait 0.2;
+		if(players.size != 1) {
+			if(player meleebuttonpressed()){
+				if(!isdefined(self.sharedreward)) {
+					self.sharedreward = true; // To Disable the Setinvisible Loop
+					self playsound("zmb_powerup_grabbed");
+					self setvisibletoall();
+					self SetHintString("Press ^3&&1^7 To Take "+Hint);
+				}
+			}
+		}
 	}
 }
 
@@ -437,15 +454,13 @@ RewardModelMain() {
 		yaw = self.angles[1] + yaw;
 		new_angles = (-60 + randomint(120), yaw, -45 + randomint(90) );
 		self rotateto( new_angles, waittime, waittime * 0.5, waittime * 0.5 );
-		if ( isDefined( self.worldgundw ) )
-			self.worldgundw rotateto( new_angles, waittime, waittime * 0.5, waittime * 0.5 );
 		wait randomfloat( waittime - 0.1 );
 	}
 }
 
 TrialsSystem(CalculatedOrigin,SelectedModel, Origin, Angles, ActivatiorModel, ActivatiorOrigim, ActivatorAngles) {
 	level endon("end_game");
-	
+	// Challenges Setup
 	Challenges = [];
 	Challenges[Challenges.size] = "K_Trial";// Regular Kills
 	Challenges[Challenges.size] = "HK_Trial";// Headshot Kills
@@ -459,17 +474,58 @@ TrialsSystem(CalculatedOrigin,SelectedModel, Origin, Angles, ActivatiorModel, Ac
 	Challenges[Challenges.size] = "BR_Trial";// Big Range Kills
 	Challenges[Challenges.size] = "TD_Trial";// Take Damage
 	Challenges[Challenges.size] = "PK_Trial";// Prone Kills
-	if(level.script == "zm_transit" && getDvar( "ui_gametype" ) == "zsurvival" ) {
-		if(getDvar( "ui_zm_mapstartlocation" ) == "town") {
+	Challenges[Challenges.size] = "SGK_Trial";// Shotgun Kills
+	Challenges[Challenges.size] = "SMGK_Trial";// SMG Kills
+	Challenges[Challenges.size] = "ASTK_Trial";// Assualt Kills
+	Challenges[Challenges.size] = "HSK_Trial";// Higher Spot Kills
+	Challenges[Challenges.size] = "JUMP_Trial";// Jump Kills
+	Challenges[Challenges.size] = "LEGK_Trial";// Leg Kills
+	Challenges[Challenges.size] = "ARMK_Trial";// Arm Kills
+	switch(level.script) {
+		case "zm_transit":
+			Challenges[Challenges.size] = "REPA_Trial";// Rebuild Barriers
+			if(getDvar( "ui_zm_mapstartlocation" ) != "farm")
+				Challenges[Challenges.size] = "LAVAK_Trial";// Lava Kills
+			if(getDvar( "ui_zm_mapstartlocation" ) == "town") {
+				Challenges[Challenges.size] = "KISZ_Trial";// Kill In Random Zone
+				Challenges[Challenges.size] = "SISZ_Trial";// Stay In Random Zone
+				Challenges[Challenges.size] = "NPAP_Trial";// Kill With no Pap Weapon
+			}
+			if(getDvar( "ui_zm_mapstartlocation" ) == "transit")
+				Challenges[Challenges.size] = "ESHK_Trial";// Shield Kills
+			break;
+			
+		case "zm_highrise":
+			Challenges[Challenges.size] = "SPPADK_Trial";// Springpad Kills
+			Challenges[Challenges.size] = "REPA_Trial";// Rebuild Barriers
 			Challenges[Challenges.size] = "KISZ_Trial";// Kill In Random Zone
 			Challenges[Challenges.size] = "SISZ_Trial";// Stay In Random Zone
 			Challenges[Challenges.size] = "NPAP_Trial";// Kill With no Pap Weapon
-		}
-	}
-	else{
-		Challenges[Challenges.size] = "KISZ_Trial";// Kill In Random Zone
-		Challenges[Challenges.size] = "SISZ_Trial";// Stay In Random Zone
-		Challenges[Challenges.size] = "NPAP_Trial";// Kill With no Pap Weapon
+			break;
+		
+		case "zm_prison":
+			Challenges[Challenges.size] = "ESHK_Trial";// Shield Kills
+			Challenges[Challenges.size] = "REPA_Trial";// Rebuild Barriers
+			Challenges[Challenges.size] = "KISZ_Trial";// Kill In Random Zone
+			Challenges[Challenges.size] = "SISZ_Trial";// Stay In Random Zone
+			Challenges[Challenges.size] = "NPAP_Trial";// Kill With no Pap Weapon
+			break;
+		
+		case "zm_buried":
+			Challenges[Challenges.size] = "SPPADK_Trial";// Springpad Kills
+			Challenges[Challenges.size] = "BASSK_Trial";// Subwoofer Kills
+			Challenges[Challenges.size] = "REPA_Trial";// Rebuild Barriers
+			Challenges[Challenges.size] = "KISZ_Trial";// Kill In Random Zone
+			Challenges[Challenges.size] = "SISZ_Trial";// Stay In Random Zone
+			Challenges[Challenges.size] = "NPAP_Trial";// Kill With no Pap Weapon
+			break;
+			
+		case "zm_tomb":
+			Challenges[Challenges.size] = "ESHK_Trial";// Shield Kills
+			Challenges[Challenges.size] = "KISZ_Trial";// Kill In Random Zone
+			Challenges[Challenges.size] = "SISZ_Trial";// Stay In Random Zone
+			Challenges[Challenges.size] = "NPAP_Trial";// Kill With no Pap Weapon
+			break;
 	}
 	
 	TrialPodium_Player1 = spawn( "script_model", Origin[0]);
@@ -576,7 +632,7 @@ MainModelAnimation(){// Teddy Floating
 	if(level.script == "zm_highrise")
 		playfx( level._effect[ "fx_highrise_dragon_tower_glow_ric" ], self.origin);
 	if(level.script == "zm_buried")
-		playfx( level._effect[ "sq_tower_bolts" ], self.origin);
+		playfx( level._effect[ "sq_tower_bolts" ], self.origin, (0,0,180), (0,0,180));
 	while(1) {
 		self moveto(self.origin + (0,0,20),randomfloatrange(0.5,4));
 		self waittill("movedone");
@@ -589,7 +645,7 @@ ChallengeHandler(Zones,Challenge){
 	if(Challenge == "K_Trial")
 		ChallengeDescription = "Kill Zombies";
 	else if(Challenge == "HK_Trial"){
-		ChallengeDescription = "Kill Zombies With Headshots";
+		ChallengeDescription = "Kill Zombies\n^3Headshots";
 		ChallengePoints = 2;
 	}
 	else if(Challenge == "MK_Trial"){
@@ -625,7 +681,7 @@ ChallengeHandler(Zones,Challenge){
 	else if(Challenge == "GO_Trial")
 		ChallengeDescription = "Kill Zombies with Grenades";
 	else if(Challenge == "C_Trial")
-		ChallengeDescription = "Kill Zombies while Crouched";
+		ChallengeDescription = "Kill Zombies while Crouching";
 	else if(Challenge == "TD_Trial"){
 		ChallengeDescription = "Take Damage";
 		ChallengePoints = 1.5;
@@ -648,19 +704,51 @@ ChallengeHandler(Zones,Challenge){
 		ChallengeDescription = "Kill Zombies in Long Range";
 	else if(Challenge == "PK_Trial")
 		ChallengeDescription = "Kill Zombies while Prone";
+	else if(Challenge == "SGK_Trial")
+		ChallengeDescription = "Kill Zombies with Shotguns";
+	else if(Challenge == "SMGK_Trial")
+		ChallengeDescription = "Kill Zombies with SMGs";
+	else if(Challenge == "ASTK_Trial")
+		ChallengeDescription = "Kill Zombies with Assault Rifles";
+	else if(Challenge == "HSK_Trial")
+		ChallengeDescription = "Kill Zombies at a Higher Position";
+	else if(Challenge == "JUMP_Trial")
+		ChallengeDescription = "Kill Zombies While in Air";
+	else if(Challenge == "LEGK_Trial")
+		ChallengeDescription = "Kill Zombies\n^3Legshots";
+	else if(Challenge == "ARMK_Trial")
+		ChallengeDescription = "Kill Zombies\n^3Armshots";
+	else if(Challenge == "ESHK_Trial")
+		ChallengeDescription = "Kill Zombies with a Riotshield";
+	else if(Challenge == "LAVAK_Trial")
+		ChallengeDescription = "Kill Zombies while Burning";
+	else if(Challenge == "REPA_Trial") {
+		ChallengeDescription = "Repair Barricades";
+		ChallengePoints = 0.5;
+		Time = 120;
+	}
+	else if(Challenge == "SPPADK_Trial")
+		ChallengeDescription = "Kill Zombies with a Tramplesteam";
+	else if(Challenge == "BASSK_Trial")
+		ChallengeDescription = "Kill Zombies with a Subwoofer";
 	
 	if(!isdefined(ChallengePoints))// Default
 		ChallengePoints = 1;
+		
 	if(!isdefined(time))// Default
 		time = 90;
+	
 	// Setup Challenge For Players
 	players = get_players();
 	for(i = 0;i < players.size;i++){
-		if(Challenge == "SISZ_Trial" || Challenge == "TD_Trial" || Challenge == "NH_Trial" || Challenge == "BRS_Trial"){
+		if(Challenge == "SISZ_Trial" || Challenge == "TD_Trial" || Challenge == "NH_Trial" || Challenge == "BRS_Trial" || Challenge == "REPA_Trial"){
 			players[i] thread PlayerTrialHandlerTime(Challenge, ChallengePoints, ChoosenZone);
 		}
-		else{
-			players[i] thread PlayerTrialHandlerKill(Challenge, ChallengePoints, ChoosenZone);
+		else {
+			if(Challenge == "SPPADK_Trial" || Challenge == "BASSK_Trial")
+				players[i] thread PlayerTrialHandlerBuildableKill(Challenge, ChallengePoints);
+			else
+				players[i] thread PlayerTrialHandlerKill(Challenge, ChallengePoints, ChoosenZone);
 		}
 		players[i] toggle_trial_challenge_hud();
 		players[i] set_trial_challenge(ChallengeDescription);
@@ -693,29 +781,44 @@ set_trial_location(zone, out_text, in_text) {
 		wait 1;
 	}
 }
-
-// All Kill Based Challenges COme in here
-PlayerTrialHandlerKill(trial, Points, SpecificZone){
-	level endon("game_ended");
+// All Buildable Based Challenges Come in here
+PlayerTrialHandlerBuildableKill(Trial, Points) {
 	self endon("TrialOver");
-	while(1){
+	self endon("disconnect");
+	level endon("end_game");
+	while(1) {
+		TrialNotify = self waittill_any_return("zombie_flung", "zombie_subwoofer_kill");
+		if(TrialNotify == "zombie_flung") {
+			if(Trial == "SPPADK_Trial")
+				self thread AddPlayerMagicPoints(Points);
+		}
+		else if(TrialNotify == "zombie_subwoofer_kill") {
+			if(Trial == "BASSK_Trial")
+				self thread AddPlayerMagicPoints(Points);
+		}
+	}
+}
+
+// All Kill Based Challenges Come in here
+PlayerTrialHandlerKill(trial, Points, SpecificZone){
+	self endon("TrialOver");
+	self endon("disconnect");
+	level endon("end_game");
+	while(1) {
 		self waittill( "zom_kill", zombie);
 		if(trial == "K_Trial")
 			self thread AddPlayerMagicPoints(Points);
 		else if(trial == "HK_Trial") {
-			if ( zombie.damagelocation == "head" || zombie.damagelocation == "helmet" || zombie.damagelocation == "neck" ) {
+			if(zombie damagelocationisany( "head", "helmet", "neck"))
 				self thread AddPlayerMagicPoints(Points);
-			}
 		}
 		else if(trial == "MK_Trial") {
-			if ( zombie.damagemod == "MOD_MELEE" || zombie.damagemod == "MOD_IMPACT" ) {
+			if(zombie.damagemod == "MOD_MELEE" || zombie.damagemod == "MOD_IMPACT")
 				self thread AddPlayerMagicPoints(Points);
-			}
 		}
 		else if(trial == "KISZ_Trial") {
-			if(self istouching(SpecificZone) && zombie istouching(SpecificZone)) {
+			if(self istouching(SpecificZone) && zombie istouching(SpecificZone))
 				self thread AddPlayerMagicPoints(Points);
-			}
 		}
 		else if(trial == "GO_Trial") {
 			if(zombie.damagemod == "MOD_GRENADE" || zombie.damagemod == "MOD_GRENADE_SPLASH" || zombie.damagemod == "MOD_EXPLOSIVE" ) {
@@ -723,41 +826,73 @@ PlayerTrialHandlerKill(trial, Points, SpecificZone){
 			}
 		}
 		else if(trial == "C_Trial") {
-			if(self GetStance() == "crouch") {
+			if(self GetStance() == "crouch")
 				self thread AddPlayerMagicPoints(Points);
-			}
 		}
 		else if(trial == "NPAP_Trial") {
-			if(!self has_upgrade(self getcurrentweapon()) && zombie.damagemod == "MOD_RIFLE_BULLET" || !self has_upgrade(self getcurrentweapon()) && zombie.damagemod == "MOD_PISTOL_BULLET") {
+			if(!self has_upgrade(self getcurrentweapon()) && zombie.damagemod == "MOD_RIFLE_BULLET" || !self has_upgrade(self getcurrentweapon()) && zombie.damagemod == "MOD_PISTOL_BULLET")
 				self thread AddPlayerMagicPoints(Points);
-			}
 		}
 		else if(trial == "NAIM_Trial") {
-			if(!isads(self)){
+			if(!isads(self))
 				self thread AddPlayerMagicPoints(Points);
-			}
 		}
 		else if(trial == "CR_Trial") {
-			if(distancesquared(self.origin,zombie.origin) <= 20000) {
+			if(distancesquared(self.origin,zombie.origin) <= 20000)
 				self thread AddPlayerMagicPoints(Points);
-			}
 		}
 		else if(trial == "BR_Trial") {
-			if(distancesquared(self.origin,zombie.origin) >= 180000) {
+			if(distancesquared(self.origin,zombie.origin) >= 180000)
 				self thread AddPlayerMagicPoints(Points);
-			}
 		}
 		else if(trial == "PK_Trial") {
-			if(self GetStance() == "prone") {
+			if(self GetStance() == "prone")
 				self thread AddPlayerMagicPoints(Points);
-			}
+		}
+		else if(trial == "SGK_Trial") {
+			if(weaponclass(self getcurrentweapon()) == "spread")
+				self thread AddPlayerMagicPoints(Points);
+		}
+		else if(trial == "SMGK_Trial") {
+			if(weaponclass(self getcurrentweapon()) == "smg")
+				self thread AddPlayerMagicPoints(Points);
+		}
+		else if(trial == "ASTK_Trial") {
+			if(weaponclass(self getcurrentweapon()) == "rifle")
+				self thread AddPlayerMagicPoints(Points);
+		}
+		else if(trial == "HSK_Trial") {
+			if(self.origin[2] >= (zombie.origin[2] + 30))
+				self thread AddPlayerMagicPoints(Points);
+		}
+		else if(trial == "JUMP_Trial") {
+			if(!isdefined(self getgroundent()))
+				self thread AddPlayerMagicPoints(Points);
+		}
+		else if(trial == "LEGK_Trial") {
+			if(zombie damagelocationisany( "left_leg_upper", "left_leg_lower", "right_leg_upper", "right_leg_lower" ))
+				self thread AddPlayerMagicPoints(Points);
+		}
+		else if(trial == "ARMK_Trial") {
+			if(zombie damagelocationisany( "right_arm_upper", "left_arm_upper", "right_arm_lower", "left_arm_lower" ))
+				self thread AddPlayerMagicPoints(Points);
+		}
+		else if(trial == "ESHK_Trial") {
+			if(zombie.damagemod == "MOD_MELEE" && self getcurrentweapon() == level.riotshield_name || zombie.damagemod == "MOD_IMPACT" && self getcurrentweapon() == level.riotshield_name )
+				self thread AddPlayerMagicPoints(Points);
+		}
+		else if(trial == "LAVAK_Trial") {
+			if(isdefined(self.is_burning) && self.is_burning == 1)
+				self thread AddPlayerMagicPoints(Points);
 		}
 	}
 }
+
 // All Time Based Challenges Come in here
 PlayerTrialHandlerTime(trial, Points, SpecificZone) {
-	level endon("game_ended");
 	self endon("TrialOver");
+	self endon("disconnect");
+	level endon("end_game");
 	while(1){
 		if(trial == "SISZ_Trial") {
 			if(isdefined(SpecificZone) && self istouching(SpecificZone)) {
@@ -783,6 +918,12 @@ PlayerTrialHandlerTime(trial, Points, SpecificZone) {
 				if(PointsSpent >= 100) {
 					self thread AddPlayerMagicPoints(Points);
 				}
+			}
+		}
+		else if(trial == "REPA_Trial") {
+			if(self.board_repair > 0) {
+				self thread AddPlayerMagicPoints(Points);
+				self.board_repair = 0;
 			}
 		}
 		wait 2.5;
@@ -837,8 +978,11 @@ PodiumSetupTrigger(CalculatedOrigin,Index){
 			RewardModel = Spawn( "script_model", CalculatedOrigin + (0,0,28));
 			RewardModel setmodel(level.Rewards_List[Reward].Model);
 			RewardModel thread RewardModelMain();
-			trigger SetHintString( "Press ^3&&1^7 To Take "+level.Rewards_List[Reward].Hint);
-			trigger thread TriggerRewardHandler(players[Index], level.Rewards_List[Reward].Name, level.Rewards_List[Reward].Powerup);
+			if(players.size == 1)// To Disable the Sharing Hint in Solo Games
+				trigger SetHintString( "Press ^3&&1^7 To Take "+level.Rewards_List[Reward].Hint);
+			else
+				trigger SetHintString( "Press ^3&&1^7 To Take "+level.Rewards_List[Reward].Hint+"\nPress ^3[{+melee}]^7 To Share Reward");
+			trigger thread TriggerRewardHandler(players[Index], level.Rewards_List[Reward].Name, level.Rewards_List[Reward].Powerup, level.Rewards_List[Reward].Hint);
 			trigger waittill_any_timeout(30, "Grabbed");
 			trigger notify("Timeout");
 			RewardModel notify("Done");
@@ -1356,18 +1500,20 @@ AddPlayerMagicPoints(num){
 ShowToSpecific(FXOrigin,Index){
 	level endon("game_ended");
 	while(1){
-		self SetInvisibleToAll(); 
-		self SetVisibleToPlayer( GetPlayers()[Index] );
-		if(isdefined(GetPlayers()[Index])){
-			if(isdefined(GetPlayers()[Index].ReaperTrialsCurrentMagic) && GetPlayers()[Index].ReaperTrialsCurrentMagic >= 25){
-				if(level.script == "zm_transit")
-					playfx( level._effect[ "character_fire_death_sm" ], FXOrigin);
-				else if(level.script == "zm_prison")
-					playfx(level._effect[ "fx_alcatraz_elec_chair" ],FXOrigin - (17,0,15),anglesToForward(0,0,0), anglesToUp(0,0,0));// Too Lazy
-				else if(level.script == "zm_buried")
-					playfx( level._effect[ "character_fire_death_sm" ], FXOrigin);
-				else if(level.script == "zm_highrise")
-					playfx( level._effect[ "character_fire_death_sm" ], FXOrigin);
+		if(!isdefined(self.sharedreward)) {
+			self SetInvisibleToAll(); 
+			self SetVisibleToPlayer( GetPlayers()[Index] );
+			if(isdefined(GetPlayers()[Index])){
+				if(isdefined(GetPlayers()[Index].ReaperTrialsCurrentMagic) && GetPlayers()[Index].ReaperTrialsCurrentMagic >= 25){
+					if(level.script == "zm_transit")
+						playfx( level._effect[ "character_fire_death_sm" ], FXOrigin);
+					else if(level.script == "zm_prison")
+						playfx(level._effect[ "fx_alcatraz_elec_chair" ],FXOrigin - (17,0,15),anglesToForward(0,0,0), anglesToUp(0,0,0));// Too Lazy
+					else if(level.script == "zm_buried")
+						playfx( level._effect[ "character_fire_death_sm" ], FXOrigin);
+					else if(level.script == "zm_highrise")
+						playfx( level._effect[ "character_fire_death_sm" ], FXOrigin);
+				}
 			}
 		}
 		wait 5;
